@@ -1,16 +1,14 @@
 from setuptools import setup, find_namespace_packages
 
 setup(
-    name='microsoft-agents-protocol',
+    name='microsoft-agents-protocols',
     version='0.0.0a1',
     packages=find_namespace_packages(),
     install_requires=[
-        # Add your project dependencies here
+        "azure-core>=1.30.0",
     ],
     author='Microsoft Corporation',
     description='A protocol library for Microsoft Agents',
-    long_description=open('README.md').read(),
-    long_description_content_type='text/markdown',
     url='https://github.com/microsoft/microsoft-agents-protocol',
     classifiers=[
         'Programming Language :: Python :: 3',

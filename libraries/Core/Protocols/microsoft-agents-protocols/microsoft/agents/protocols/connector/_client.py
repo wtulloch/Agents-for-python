@@ -28,12 +28,12 @@ class Connector:  # pylint: disable=client-accepts-api-version-keyword
     © 2020 Microsoft.
 
     :ivar attachments: AttachmentsOperations operations
-    :vartype attachments: Microsoft.Agents.Protocols.Connector.operations.AttachmentsOperations
+    :vartype attachments: microsoft.agents.protocols.connector.operations.AttachmentsOperations
     :ivar conversations: ConversationsOperations operations
-    :vartype conversations: Microsoft.Agents.Protocols.Connector.operations.ConversationsOperations
+    :vartype conversations: microsoft.agents.protocols.connector.operations.ConversationsOperations
     :ivar connector_internals: ConnectorInternalsOperations operations
     :vartype connector_internals:
-     Microsoft.Agents.Protocols.Connector.operations.ConnectorInternalsOperations
+     microsoft.agents.protocols.connector.operations.ConnectorInternalsOperations
     :keyword endpoint: Service URL. Required. Default value is "".
     :paramtype endpoint: str
     """

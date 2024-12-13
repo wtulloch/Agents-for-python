@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------------
 from io import IOBase
 import sys
-from typing import Any, Callable, Dict, IO, Iterator, List, Optional, TypeVar, Union, cast, overload
+from typing import Any, AsyncIterator, Callable, Dict, IO, List, Optional, TypeVar, Union, cast, overload
 
 from azure.core.exceptions import (
     ClientAuthenticationError,
@@ -19,11 +19,58 @@ from azure.core.exceptions import (
     map_error,
 )
 from azure.core.pipeline import PipelineResponse
-from azure.core.rest import HttpRequest, HttpResponse
-from azure.core.tracing.decorator import distributed_trace
+from azure.core.rest import AsyncHttpResponse, HttpRequest
+from azure.core.tracing.decorator_async import distributed_trace_async
 from azure.core.utils import case_insensitive_dict
 
-from .._serialization import Serializer
+from ...operations._operations import (
+    build_attachments_get_attachment_info_request,
+    build_attachments_get_attachment_request,
+    build_connector_internals_activity_event_names_request,
+    build_connector_internals_activity_request,
+    build_connector_internals_adaptive_card_invoke_action_request,
+    build_connector_internals_adaptive_card_invoke_response_request,
+    build_connector_internals_adaptive_card_invoke_value_request,
+    build_connector_internals_animation_card_request,
+    build_connector_internals_attachment_info_request,
+    build_connector_internals_audio_card_request,
+    build_connector_internals_basic_card_request,
+    build_connector_internals_conversation_resource_response_request,
+    build_connector_internals_conversations_result_request,
+    build_connector_internals_expected_replies_request,
+    build_connector_internals_hero_card_request,
+    build_connector_internals_invoke_response_request,
+    build_connector_internals_media_card_request,
+    build_connector_internals_mention_request,
+    build_connector_internals_o_auth_card_request,
+    build_connector_internals_paged_members_result_request,
+    build_connector_internals_post_error_response_request,
+    build_connector_internals_receipt_card_request,
+    build_connector_internals_resource_response_request,
+    build_connector_internals_search_invoke_response_request,
+    build_connector_internals_search_invoke_value_request,
+    build_connector_internals_signin_card_request,
+    build_connector_internals_thumbnail_card_request,
+    build_connector_internals_token_exchange_invoke_request_request,
+    build_connector_internals_token_exchange_invoke_response_request,
+    build_connector_internals_token_exchange_resource_request,
+    build_connector_internals_token_exchange_state_request,
+    build_connector_internals_token_response_request,
+    build_connector_internals_video_card_request,
+    build_conversations_create_conversation_request,
+    build_conversations_delete_activity_request,
+    build_conversations_delete_conversation_member_request,
+    build_conversations_get_activity_members_request,
+    build_conversations_get_conversation_member_request,
+    build_conversations_get_conversation_members_request,
+    build_conversations_get_conversation_paged_members_request,
+    build_conversations_get_conversations_request,
+    build_conversations_reply_to_activity_request,
+    build_conversations_send_conversation_history_request,
+    build_conversations_send_to_conversation_request,
+    build_conversations_update_activity_request,
+    build_conversations_upload_attachment_request,
+)
 
 if sys.version_info >= (3, 9):
     from collections.abc import MutableMapping
@@ -31,911 +78,7 @@ else:
     from typing import MutableMapping  # type: ignore
 JSON = MutableMapping[str, Any]  # pylint: disable=unsubscriptable-object
 T = TypeVar("T")
-ClsType = Optional[Callable[[PipelineResponse[HttpRequest, HttpResponse], T, Dict[str, Any]], Any]]
-
-_SERIALIZER = Serializer()
-_SERIALIZER.client_side_validation = False
-
-
-def build_attachments_get_attachment_info_request(  # pylint: disable=name-too-long
-    attachment_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/attachments/{attachmentId}"
-    path_format_arguments = {
-        "attachmentId": _SERIALIZER.url("attachment_id", attachment_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
-
-
-def build_attachments_get_attachment_request(attachment_id: str, view_id: str, **kwargs: Any) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/octet-stream, application/json")
-
-    # Construct URL
-    _url = "/v3/attachments/{attachmentId}/views/{viewId}"
-    path_format_arguments = {
-        "attachmentId": _SERIALIZER.url("attachment_id", attachment_id, "str"),
-        "viewId": _SERIALIZER.url("view_id", view_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_get_conversations_request(  # pylint: disable=name-too-long
-    *, continuation_token_parameter: Optional[str] = None, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations"
-
-    # Construct parameters
-    if continuation_token_parameter is not None:
-        _params["continuationToken"] = _SERIALIZER.query(
-            "continuation_token_parameter", continuation_token_parameter, "str"
-        )
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
-
-
-def build_conversations_create_conversation_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_send_to_conversation_request(  # pylint: disable=name-too-long
-    conversation_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/activities"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_send_conversation_history_request(  # pylint: disable=name-too-long
-    conversation_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/activities/history"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_update_activity_request(  # pylint: disable=name-too-long
-    conversation_id: str, activity_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/activities/{activityId}"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-        "activityId": _SERIALIZER.url("activity_id", activity_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="PUT", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_reply_to_activity_request(  # pylint: disable=name-too-long
-    conversation_id: str, activity_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/activities/{activityId}"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-        "activityId": _SERIALIZER.url("activity_id", activity_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_delete_activity_request(  # pylint: disable=name-too-long
-    conversation_id: str, activity_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/activities/{activityId}"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-        "activityId": _SERIALIZER.url("activity_id", activity_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_get_conversation_members_request(  # pylint: disable=name-too-long
-    conversation_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/members"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_get_conversation_member_request(  # pylint: disable=name-too-long
-    conversation_id: str, member_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/members/{memberId}"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-        "memberId": _SERIALIZER.url("member_id", member_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_delete_conversation_member_request(  # pylint: disable=name-too-long
-    conversation_id: str, member_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/members/{memberId}"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-        "memberId": _SERIALIZER.url("member_id", member_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_get_conversation_paged_members_request(  # pylint: disable=name-too-long
-    conversation_id: str,
-    *,
-    page_size: Optional[int] = None,
-    continuation_token_parameter: Optional[str] = None,
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/pagedmembers"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct parameters
-    if page_size is not None:
-        _params["pageSize"] = _SERIALIZER.query("page_size", page_size, "int")
-    if continuation_token_parameter is not None:
-        _params["continuationToken"] = _SERIALIZER.query(
-            "continuation_token_parameter", continuation_token_parameter, "str"
-        )
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
-
-
-def build_conversations_get_activity_members_request(  # pylint: disable=name-too-long
-    conversation_id: str, activity_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/activities/{activityId}/members"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-        "activityId": _SERIALIZER.url("activity_id", activity_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
-
-
-def build_conversations_upload_attachment_request(  # pylint: disable=name-too-long
-    conversation_id: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/conversations/{conversationId}/attachments"
-    path_format_arguments = {
-        "conversationId": _SERIALIZER.url("conversation_id", conversation_id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_activity_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/activity"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_activity_event_names_request(  # pylint: disable=name-too-long
-    *, json: Optional[str] = None, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/activityEventNames"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, json=json, **kwargs)
-
-
-def build_connector_internals_expected_replies_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/expectedReplies"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_animation_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/animationCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_audio_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/audioCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_basic_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/basicCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_hero_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/heroCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_media_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/mediaCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_o_auth_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/oAuthCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_receipt_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/receiptCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_signin_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/signinCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_thumbnail_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/thumbnailCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_video_card_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/videoCard"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_mention_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/mention"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_token_exchange_state_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/tokenExchangeState"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_token_exchange_resource_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/tokenExchangeResource"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_token_exchange_invoke_request_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/tokenExchangeInvokeRequest"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_token_exchange_invoke_response_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/tokenExchangeInvokeResponse"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_invoke_response_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/invokeResponse"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_token_response_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/tokenResponse"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_resource_response_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/resourceResponse"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_adaptive_card_invoke_action_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/adaptiveCardInvokeAction"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_adaptive_card_invoke_response_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/adaptiveCardInvokeResponse"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_adaptive_card_invoke_value_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/adaptiveCardInvokeValue"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_search_invoke_response_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/searchInvokeResponse"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_search_invoke_value_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/searchInvokeValue"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_conversations_result_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/conversationsResult"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_paged_members_result_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/pagedMembersResult"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_attachment_info_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/attachmentInfo"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_conversation_resource_response_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/conversationResourceResponse"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connector_internals_post_error_response_request(  # pylint: disable=name-too-long
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v3/connectorInternals/errorResponse"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+ClsType = Optional[Callable[[PipelineResponse[HttpRequest, AsyncHttpResponse], T, Dict[str, Any]], Any]]
 
 
 class AttachmentsOperations:
@@ -944,19 +87,19 @@ class AttachmentsOperations:
         **DO NOT** instantiate this class directly.
 
         Instead, you should access the following operations through
-        :class:`~Microsoft.Agents.Protocols.Connector.Connector`'s
+        :class:`~microsoft.agents.protocols.connector.aio.Connector`'s
         :attr:`attachments` attribute.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         input_args = list(args)
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
         self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
 
-    @distributed_trace
-    def get_attachment_info(self, attachment_id: str, **kwargs: Any) -> JSON:
+    @distributed_trace_async
+    async def get_attachment_info(self, attachment_id: str, **kwargs: Any) -> JSON:
         """GetAttachmentInfo.
 
         Get AttachmentInfo structure describing the attachment views.
@@ -1003,7 +146,7 @@ class AttachmentsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -1023,8 +166,8 @@ class AttachmentsOperations:
 
         return cast(JSON, deserialized)  # type: ignore
 
-    @distributed_trace
-    def get_attachment(self, attachment_id: str, view_id: str, **kwargs: Any) -> Optional[Iterator[bytes]]:
+    @distributed_trace_async
+    async def get_attachment(self, attachment_id: str, view_id: str, **kwargs: Any) -> Optional[AsyncIterator[bytes]]:
         """GetAttachment.
 
         Get the named view as binary content.
@@ -1033,8 +176,8 @@ class AttachmentsOperations:
         :type attachment_id: str
         :param view_id: View id from attachmentInfo. Required.
         :type view_id: str
-        :return: Iterator[bytes] or None
-        :rtype: Iterator[bytes] or None
+        :return: AsyncIterator[bytes] or None
+        :rtype: AsyncIterator[bytes] or None
         :raises ~azure.core.exceptions.HttpResponseError:
         """
         error_map: MutableMapping = {
@@ -1048,7 +191,7 @@ class AttachmentsOperations:
         _headers = kwargs.pop("headers", {}) or {}
         _params = kwargs.pop("params", {}) or {}
 
-        cls: ClsType[Optional[Iterator[bytes]]] = kwargs.pop("cls", None)
+        cls: ClsType[Optional[AsyncIterator[bytes]]] = kwargs.pop("cls", None)
 
         _request = build_attachments_get_attachment_request(
             attachment_id=attachment_id,
@@ -1059,7 +202,7 @@ class AttachmentsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = True
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -1067,7 +210,7 @@ class AttachmentsOperations:
 
         if response.status_code not in [200, 301, 302]:
             try:
-                response.read()  # Load the body in memory and close the socket
+                await response.read()  # Load the body in memory and close the socket
             except (StreamConsumedError, StreamClosedError):
                 pass
             map_error(status_code=response.status_code, response=response, error_map=error_map)
@@ -1089,19 +232,19 @@ class ConversationsOperations:
         **DO NOT** instantiate this class directly.
 
         Instead, you should access the following operations through
-        :class:`~Microsoft.Agents.Protocols.Connector.Connector`'s
+        :class:`~microsoft.agents.protocols.connector.aio.Connector`'s
         :attr:`conversations` attribute.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         input_args = list(args)
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
         self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
 
-    @distributed_trace
-    def get_conversations(self, *, continuation_token_parameter: Optional[str] = None, **kwargs: Any) -> JSON:
+    @distributed_trace_async
+    async def get_conversations(self, *, continuation_token_parameter: Optional[str] = None, **kwargs: Any) -> JSON:
         """GetConversations.
 
         List the Conversations in which this bot has participated.
@@ -1164,7 +307,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -1185,7 +328,7 @@ class ConversationsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @overload
-    def create_conversation(
+    async def create_conversation(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> JSON:
         """CreateConversation.
@@ -1409,7 +552,7 @@ class ConversationsOperations:
         """
 
     @overload
-    def create_conversation(
+    async def create_conversation(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> JSON:
         """CreateConversation.
@@ -1457,8 +600,8 @@ class ConversationsOperations:
                 }
         """
 
-    @distributed_trace
-    def create_conversation(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> JSON:
+    @distributed_trace_async
+    async def create_conversation(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> JSON:
         """CreateConversation.
 
         Create a new Conversation.
@@ -1711,7 +854,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -1732,13 +875,13 @@ class ConversationsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @overload
-    def send_to_conversation(
+    async def send_to_conversation(
         self,
         conversation_id: str,
         body: Optional[JSON] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """SendToConversation.
 
@@ -1933,13 +1076,13 @@ class ConversationsOperations:
         """
 
     @overload
-    def send_to_conversation(
+    async def send_to_conversation(
         self,
         conversation_id: str,
         body: Optional[IO[bytes]] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """SendToConversation.
 
@@ -1978,8 +1121,8 @@ class ConversationsOperations:
                 }
         """
 
-    @distributed_trace
-    def send_to_conversation(
+    @distributed_trace_async
+    async def send_to_conversation(
         self, conversation_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
     ) -> JSON:
         """SendToConversation.
@@ -2207,7 +1350,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -2228,13 +1371,13 @@ class ConversationsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @overload
-    def send_conversation_history(
+    async def send_conversation_history(
         self,
         conversation_id: str,
         body: Optional[JSON] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """SendConversationHistory.
 
@@ -2424,13 +1567,13 @@ class ConversationsOperations:
         """
 
     @overload
-    def send_conversation_history(
+    async def send_conversation_history(
         self,
         conversation_id: str,
         body: Optional[IO[bytes]] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """SendConversationHistory.
 
@@ -2460,8 +1603,8 @@ class ConversationsOperations:
                 }
         """
 
-    @distributed_trace
-    def send_conversation_history(
+    @distributed_trace_async
+    async def send_conversation_history(
         self, conversation_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
     ) -> JSON:
         """SendConversationHistory.
@@ -2684,7 +1827,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -2705,14 +1848,14 @@ class ConversationsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @overload
-    def update_activity(
+    async def update_activity(
         self,
         conversation_id: str,
         activity_id: str,
         body: Optional[JSON] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """UpdateActivity.
 
@@ -2901,14 +2044,14 @@ class ConversationsOperations:
         """
 
     @overload
-    def update_activity(
+    async def update_activity(
         self,
         conversation_id: str,
         activity_id: str,
         body: Optional[IO[bytes]] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """UpdateActivity.
 
@@ -2941,8 +2084,8 @@ class ConversationsOperations:
                 }
         """
 
-    @distributed_trace
-    def update_activity(
+    @distributed_trace_async
+    async def update_activity(
         self, conversation_id: str, activity_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
     ) -> JSON:
         """UpdateActivity.
@@ -3165,7 +2308,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -3186,14 +2329,14 @@ class ConversationsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @overload
-    def reply_to_activity(
+    async def reply_to_activity(
         self,
         conversation_id: str,
         activity_id: str,
         body: Optional[JSON] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """ReplyToActivity.
 
@@ -3390,14 +2533,14 @@ class ConversationsOperations:
         """
 
     @overload
-    def reply_to_activity(
+    async def reply_to_activity(
         self,
         conversation_id: str,
         activity_id: str,
         body: Optional[IO[bytes]] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """ReplyToActivity.
 
@@ -3438,8 +2581,8 @@ class ConversationsOperations:
                 }
         """
 
-    @distributed_trace
-    def reply_to_activity(
+    @distributed_trace_async
+    async def reply_to_activity(
         self, conversation_id: str, activity_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
     ) -> JSON:
         """ReplyToActivity.
@@ -3670,7 +2813,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -3690,10 +2833,8 @@ class ConversationsOperations:
 
         return cast(JSON, deserialized)  # type: ignore
 
-    @distributed_trace
-    def delete_activity(  # pylint: disable=inconsistent-return-statements
-        self, conversation_id: str, activity_id: str, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def delete_activity(self, conversation_id: str, activity_id: str, **kwargs: Any) -> None:
         """DeleteActivity.
 
         Delete an existing activity.
@@ -3731,7 +2872,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -3744,8 +2885,8 @@ class ConversationsOperations:
         if cls:
             return cls(pipeline_response, None, {})  # type: ignore
 
-    @distributed_trace
-    def get_conversation_members(self, conversation_id: str, **kwargs: Any) -> List[JSON]:
+    @distributed_trace_async
+    async def get_conversation_members(self, conversation_id: str, **kwargs: Any) -> List[JSON]:
         """GetConversationMembers.
 
         Enumerate the members of a conversation.
@@ -3793,7 +2934,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -3813,8 +2954,8 @@ class ConversationsOperations:
 
         return cast(List[JSON], deserialized)  # type: ignore
 
-    @distributed_trace
-    def get_conversation_member(self, conversation_id: str, member_id: str, **kwargs: Any) -> JSON:
+    @distributed_trace_async
+    async def get_conversation_member(self, conversation_id: str, member_id: str, **kwargs: Any) -> JSON:
         """GetConversationMember.
 
         Get a single member of a conversation.
@@ -3863,7 +3004,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -3883,10 +3024,8 @@ class ConversationsOperations:
 
         return cast(JSON, deserialized)  # type: ignore
 
-    @distributed_trace
-    def delete_conversation_member(  # pylint: disable=inconsistent-return-statements
-        self, conversation_id: str, member_id: str, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def delete_conversation_member(self, conversation_id: str, member_id: str, **kwargs: Any) -> None:
         """DeleteConversationMember.
 
         Deletes a member from a conversation.
@@ -3925,7 +3064,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -3938,14 +3077,14 @@ class ConversationsOperations:
         if cls:
             return cls(pipeline_response, None, {})  # type: ignore
 
-    @distributed_trace
-    def get_conversation_paged_members(
+    @distributed_trace_async
+    async def get_conversation_paged_members(
         self,
         conversation_id: str,
         *,
         page_size: Optional[int] = None,
         continuation_token_parameter: Optional[str] = None,
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """GetConversationPagedMembers.
 
@@ -4014,7 +3153,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -4034,8 +3173,8 @@ class ConversationsOperations:
 
         return cast(JSON, deserialized)  # type: ignore
 
-    @distributed_trace
-    def get_activity_members(self, conversation_id: str, activity_id: str, **kwargs: Any) -> List[JSON]:
+    @distributed_trace_async
+    async def get_activity_members(self, conversation_id: str, activity_id: str, **kwargs: Any) -> List[JSON]:
         """GetActivityMembers.
 
         Enumerate the members of an activity.
@@ -4086,7 +3225,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -4107,13 +3246,13 @@ class ConversationsOperations:
         return cast(List[JSON], deserialized)  # type: ignore
 
     @overload
-    def upload_attachment(
+    async def upload_attachment(
         self,
         conversation_id: str,
         body: Optional[JSON] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """UploadAttachment.
 
@@ -4154,13 +3293,13 @@ class ConversationsOperations:
         """
 
     @overload
-    def upload_attachment(
+    async def upload_attachment(
         self,
         conversation_id: str,
         body: Optional[IO[bytes]] = None,
         *,
         content_type: str = "application/json",
-        **kwargs: Any,
+        **kwargs: Any
     ) -> JSON:
         """UploadAttachment.
 
@@ -4192,8 +3331,8 @@ class ConversationsOperations:
                 }
         """
 
-    @distributed_trace
-    def upload_attachment(
+    @distributed_trace_async
+    async def upload_attachment(
         self, conversation_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
     ) -> JSON:
         """UploadAttachment.
@@ -4266,7 +3405,7 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -4293,11 +3432,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         **DO NOT** instantiate this class directly.
 
         Instead, you should access the following operations through
-        :class:`~Microsoft.Agents.Protocols.Connector.Connector`'s
+        :class:`~microsoft.agents.protocols.connector.aio.Connector`'s
         :attr:`connector_internals` attribute.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         input_args = list(args)
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
@@ -4305,7 +3444,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
 
     @overload
-    def activity(self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any) -> None:
+    async def activity(
+        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+    ) -> None:
         """PostActivity.
 
         PostActivity.
@@ -4479,7 +3620,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def activity(
+    async def activity(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostActivity.
@@ -4496,10 +3637,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def activity(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def activity(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostActivity.
 
         PostActivity.
@@ -4703,7 +3842,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -4716,10 +3855,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         if cls:
             return cls(pipeline_response, None, {})  # type: ignore
 
-    @distributed_trace
-    def activity_event_names(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[str] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def activity_event_names(self, body: Optional[str] = None, **kwargs: Any) -> None:
         """PostActivityEventNames.
 
         PostActivityEventNames.
@@ -4759,7 +3896,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -4773,7 +3910,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def expected_replies(
+    async def expected_replies(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostExpectedReplies.
@@ -4953,7 +4090,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def expected_replies(
+    async def expected_replies(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostExpectedReplies.
@@ -4970,10 +4107,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def expected_replies(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def expected_replies(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostExpectedReplies.
 
         PostExpectedReplies.
@@ -5181,7 +4316,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -5195,7 +4330,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def animation_card(
+    async def animation_card(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAnimationCard.
@@ -5251,7 +4386,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def animation_card(
+    async def animation_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAnimationCard.
@@ -5268,10 +4403,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def animation_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def animation_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostAnimationCard.
 
         PostAnimationCard.
@@ -5355,7 +4488,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -5369,7 +4502,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def audio_card(self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any) -> None:
+    async def audio_card(
+        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+    ) -> None:
         """PostAudioCard.
 
         PostAudioCard.
@@ -5423,7 +4558,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def audio_card(
+    async def audio_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAudioCard.
@@ -5440,10 +4575,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def audio_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def audio_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostAudioCard.
 
         PostAudioCard.
@@ -5527,7 +4660,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -5541,7 +4674,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def basic_card(self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any) -> None:
+    async def basic_card(
+        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+    ) -> None:
         """PostBasicCard.
 
         PostBasicCard.
@@ -5605,7 +4740,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def basic_card(
+    async def basic_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostBasicCard.
@@ -5622,10 +4757,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def basic_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def basic_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostBasicCard.
 
         PostBasicCard.
@@ -5719,7 +4852,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -5733,7 +4866,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def hero_card(self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any) -> None:
+    async def hero_card(
+        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+    ) -> None:
         """PostHeroCard.
 
         PostHeroCard.
@@ -5797,7 +4932,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def hero_card(
+    async def hero_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostHeroCard.
@@ -5814,10 +4949,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def hero_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def hero_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostHeroCard.
 
         PostHeroCard.
@@ -5911,7 +5044,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -5925,7 +5058,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def media_card(self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any) -> None:
+    async def media_card(
+        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+    ) -> None:
         """PostMediaCard.
 
         PostMediaCard.
@@ -5979,7 +5114,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def media_card(
+    async def media_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostMediaCard.
@@ -5996,10 +5131,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def media_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def media_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostMediaCard.
 
         PostMediaCard.
@@ -6083,7 +5216,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -6097,7 +5230,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def o_auth_card(
+    async def o_auth_card(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostOAuthCard.
@@ -6141,7 +5274,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def o_auth_card(
+    async def o_auth_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostOAuthCard.
@@ -6158,10 +5291,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def o_auth_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def o_auth_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostOAuthCard.
 
         PostOAuthCard.
@@ -6233,7 +5364,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -6247,7 +5378,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def receipt_card(
+    async def receipt_card(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostReceiptCard.
@@ -6337,7 +5468,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def receipt_card(
+    async def receipt_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostReceiptCard.
@@ -6354,10 +5485,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def receipt_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def receipt_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostReceiptCard.
 
         PostReceiptCard.
@@ -6475,7 +5604,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -6489,7 +5618,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def signin_card(
+    async def signin_card(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostSigninCard.
@@ -6527,7 +5656,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def signin_card(
+    async def signin_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostSigninCard.
@@ -6544,10 +5673,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def signin_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def signin_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostSigninCard.
 
         PostSigninCard.
@@ -6613,7 +5740,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -6627,7 +5754,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def thumbnail_card(
+    async def thumbnail_card(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostThumbnailCard.
@@ -6693,7 +5820,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def thumbnail_card(
+    async def thumbnail_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostThumbnailCard.
@@ -6710,10 +5837,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def thumbnail_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def thumbnail_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostThumbnailCard.
 
         PostThumbnailCard.
@@ -6807,7 +5932,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -6821,7 +5946,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def video_card(self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any) -> None:
+    async def video_card(
+        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+    ) -> None:
         """PostVideoCard.
 
         PostVideoCard.
@@ -6875,7 +6002,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def video_card(
+    async def video_card(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostVideoCard.
@@ -6892,10 +6019,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def video_card(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def video_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostVideoCard.
 
         PostVideoCard.
@@ -6979,7 +6104,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -6993,7 +6118,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def mention(self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any) -> None:
+    async def mention(
+        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+    ) -> None:
         """PostMention.
 
         PostMention.
@@ -7024,7 +6151,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def mention(
+    async def mention(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostMention.
@@ -7041,10 +6168,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def mention(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def mention(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostMention.
 
         PostMention.
@@ -7105,7 +6230,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -7119,7 +6244,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def token_exchange_state(
+    async def token_exchange_state(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeState.
@@ -7200,7 +6325,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def token_exchange_state(
+    async def token_exchange_state(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeState.
@@ -7217,10 +6342,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def token_exchange_state(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def token_exchange_state(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostTokenExchangeState.
 
         PostTokenExchangeState.
@@ -7330,7 +6453,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -7344,7 +6467,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def token_exchange_resource(
+    async def token_exchange_resource(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeResource.
@@ -7372,7 +6495,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def token_exchange_resource(
+    async def token_exchange_resource(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeResource.
@@ -7389,10 +6512,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def token_exchange_resource(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def token_exchange_resource(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostTokenExchangeResource.
 
         PostTokenExchangeResource.
@@ -7449,7 +6570,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -7463,7 +6584,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def token_exchange_invoke_request(
+    async def token_exchange_invoke_request(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeInvokeRequest.
@@ -7490,7 +6611,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def token_exchange_invoke_request(
+    async def token_exchange_invoke_request(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeInvokeRequest.
@@ -7507,10 +6628,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def token_exchange_invoke_request(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def token_exchange_invoke_request(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostTokenExchangeInvokeRequest.
 
         PostTokenExchangeInvokeRequest.
@@ -7566,7 +6685,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -7580,7 +6699,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def token_exchange_invoke_response(
+    async def token_exchange_invoke_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeInvokeResponse.
@@ -7607,7 +6726,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def token_exchange_invoke_response(
+    async def token_exchange_invoke_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeInvokeResponse.
@@ -7624,8 +6743,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def token_exchange_invoke_response(  # pylint: disable=inconsistent-return-statements
+    @distributed_trace_async
+    async def token_exchange_invoke_response(
         self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
     ) -> None:
         """PostTokenExchangeInvokeResponse.
@@ -7683,7 +6802,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -7697,7 +6816,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def invoke_response(
+    async def invoke_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostInvokeResponse.
@@ -7724,7 +6843,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def invoke_response(
+    async def invoke_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostInvokeResponse.
@@ -7741,10 +6860,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def invoke_response(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def invoke_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostInvokeResponse.
 
         PostInvokeResponse.
@@ -7799,7 +6916,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -7813,7 +6930,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def token_response(
+    async def token_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenResponse.
@@ -7842,7 +6959,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def token_response(
+    async def token_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenResponse.
@@ -7859,10 +6976,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def token_response(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def token_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostTokenResponse.
 
         PostTokenResponse.
@@ -7919,7 +7034,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -7933,7 +7048,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def resource_response(
+    async def resource_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostResourceResponse.
@@ -7959,7 +7074,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def resource_response(
+    async def resource_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostResourceResponse.
@@ -7976,10 +7091,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def resource_response(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def resource_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostResourceResponse.
 
         PostResourceResponse.
@@ -8034,7 +7147,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -8048,7 +7161,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def adaptive_card_invoke_action(
+    async def adaptive_card_invoke_action(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeAction.
@@ -8077,7 +7190,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def adaptive_card_invoke_action(
+    async def adaptive_card_invoke_action(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeAction.
@@ -8094,10 +7207,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def adaptive_card_invoke_action(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def adaptive_card_invoke_action(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostAdaptiveCardInvokeAction.
 
         PostAdaptiveCardInvokeAction.
@@ -8155,7 +7266,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -8169,7 +7280,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def adaptive_card_invoke_response(
+    async def adaptive_card_invoke_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeResponse.
@@ -8197,7 +7308,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def adaptive_card_invoke_response(
+    async def adaptive_card_invoke_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeResponse.
@@ -8214,10 +7325,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def adaptive_card_invoke_response(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def adaptive_card_invoke_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostAdaptiveCardInvokeResponse.
 
         PostAdaptiveCardInvokeResponse.
@@ -8274,7 +7383,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -8288,7 +7397,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def adaptive_card_invoke_value(
+    async def adaptive_card_invoke_value(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeValue.
@@ -8324,7 +7433,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def adaptive_card_invoke_value(
+    async def adaptive_card_invoke_value(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeValue.
@@ -8341,10 +7450,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def adaptive_card_invoke_value(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def adaptive_card_invoke_value(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostAdaptiveCardInvokeValue.
 
         PostAdaptiveCardInvokeValue.
@@ -8409,7 +7516,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -8423,7 +7530,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def search_invoke_response(
+    async def search_invoke_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostSearchInvokeResponse.
@@ -8451,7 +7558,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def search_invoke_response(
+    async def search_invoke_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostSearchInvokeResponse.
@@ -8468,10 +7575,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def search_invoke_response(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def search_invoke_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostSearchInvokeResponse.
 
         PostSearchInvokeResponse.
@@ -8528,7 +7633,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -8542,7 +7647,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def search_invoke_value(
+    async def search_invoke_value(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostSearchInvokeValue.
@@ -8571,7 +7676,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def search_invoke_value(
+    async def search_invoke_value(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostSearchInvokeValue.
@@ -8588,10 +7693,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def search_invoke_value(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def search_invoke_value(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostSearchInvokeValue.
 
         PostSearchInvokeValue.
@@ -8649,7 +7752,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -8663,7 +7766,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def conversations_result(
+    async def conversations_result(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostConversationsResult.
@@ -8702,7 +7805,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def conversations_result(
+    async def conversations_result(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostConversationsResult.
@@ -8719,10 +7822,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def conversations_result(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def conversations_result(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostConversationsResult.
 
         PostConversationsResult.
@@ -8790,7 +7891,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -8804,7 +7905,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def paged_members_result(
+    async def paged_members_result(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostPagedMembersResult.
@@ -8838,7 +7939,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def paged_members_result(
+    async def paged_members_result(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostPagedMembersResult.
@@ -8855,10 +7956,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def paged_members_result(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def paged_members_result(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostPagedMembersResult.
 
         PostPagedMembersResult.
@@ -8921,7 +8020,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -8935,7 +8034,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def attachment_info(
+    async def attachment_info(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAttachmentInfo.
@@ -8968,7 +8067,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def attachment_info(
+    async def attachment_info(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostAttachmentInfo.
@@ -8985,10 +8084,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def attachment_info(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def attachment_info(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostAttachmentInfo.
 
         PostAttachmentInfo.
@@ -9049,7 +8146,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -9063,7 +8160,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def conversation_resource_response(
+    async def conversation_resource_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostConversationResourceResponse.
@@ -9091,7 +8188,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def conversation_resource_response(
+    async def conversation_resource_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostConversationResourceResponse.
@@ -9108,8 +8205,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def conversation_resource_response(  # pylint: disable=inconsistent-return-statements
+    @distributed_trace_async
+    async def conversation_resource_response(
         self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
     ) -> None:
         """PostConversationResourceResponse.
@@ -9168,7 +8265,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -9182,7 +8279,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    def post_error_response(
+    async def post_error_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostErrorResponse.
@@ -9215,7 +8312,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @overload
-    def post_error_response(
+    async def post_error_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostErrorResponse.
@@ -9232,10 +8329,8 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace
-    def post_error_response(  # pylint: disable=inconsistent-return-statements
-        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
-    ) -> None:
+    @distributed_trace_async
+    async def post_error_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
         """PostErrorResponse.
 
         PostErrorResponse.
@@ -9296,7 +8391,7 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
