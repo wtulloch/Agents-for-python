@@ -6,21 +6,28 @@
 
 from typing import Any
 
+from azure.core.credentials import AzureKeyCredential
 from azure.core.pipeline import policies
 
 VERSION = "unknown"
 
 
-class ConnectorConfiguration:  # pylint: disable=too-many-instance-attributes
-    """Configuration for Connector.
+class TokenConfiguration:  # pylint: disable=too-many-instance-attributes
+    """Configuration for Token.
 
     Note that all parameters used to create this instance are saved as instance
     attributes.
+
+    :param credential: Credential needed for the client to connect to Azure. Required.
+    :type credential: ~azure.core.credentials.AzureKeyCredential
     """
 
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, credential: AzureKeyCredential, **kwargs: Any) -> None:
+        if credential is None:
+            raise ValueError("Parameter 'credential' must not be None.")
 
-        kwargs.setdefault("sdk_moniker", "connector/{}".format(VERSION))
+        self.credential = credential
+        kwargs.setdefault("sdk_moniker", "token/{}".format(VERSION))
         self.polling_interval = kwargs.get("polling_interval", 30)
         self._configure(**kwargs)
 
@@ -31,6 +38,8 @@ class ConnectorConfiguration:  # pylint: disable=too-many-instance-attributes
         self.logging_policy = kwargs.get("logging_policy") or policies.NetworkTraceLoggingPolicy(**kwargs)
         self.http_logging_policy = kwargs.get("http_logging_policy") or policies.HttpLoggingPolicy(**kwargs)
         self.custom_hook_policy = kwargs.get("custom_hook_policy") or policies.CustomHookPolicy(**kwargs)
-        self.redirect_policy = kwargs.get("redirect_policy") or policies.RedirectPolicy(**kwargs)
-        self.retry_policy = kwargs.get("retry_policy") or policies.RetryPolicy(**kwargs)
+        self.redirect_policy = kwargs.get("redirect_policy") or policies.AsyncRedirectPolicy(**kwargs)
+        self.retry_policy = kwargs.get("retry_policy") or policies.AsyncRetryPolicy(**kwargs)
         self.authentication_policy = kwargs.get("authentication_policy")
+        if self.credential and not self.authentication_policy:
+            self.authentication_policy = policies.AzureKeyCredentialPolicy(self.credential, "Authorization", **kwargs)

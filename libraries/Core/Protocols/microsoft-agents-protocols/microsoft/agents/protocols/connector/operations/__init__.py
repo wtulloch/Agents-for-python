@@ -8,15 +8,15 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ._patch import *  # pylint: disable=unused-wildcard-import
+    from ._connector_operations_async_patch import *  # pylint: disable=unused-wildcard-import
 
-from ._operations import AttachmentsOperations  # type: ignore
-from ._operations import ConversationsOperations  # type: ignore
-from ._operations import ConnectorInternalsOperations  # type: ignore
+from ._connector_operations_async import AttachmentsOperations  # type: ignore
+from ._connector_operations_async import ConversationsOperations  # type: ignore
+from ._connector_operations_async import ConnectorInternalsOperations  # type: ignore
 
-from ._patch import __all__ as _patch_all
-from ._patch import *
-from ._patch import patch_sdk as _patch_sdk
+from ._connector_operations_async_patch import __all__ as _patch_all
+from ._connector_operations_async_patch import *
+from ._connector_operations_async_patch import patch_sdk as _patch_sdk
 
 __all__ = [
     "AttachmentsOperations",

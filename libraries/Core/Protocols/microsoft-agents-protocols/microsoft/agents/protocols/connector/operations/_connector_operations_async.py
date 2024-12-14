@@ -23,7 +23,7 @@ from azure.core.rest import AsyncHttpResponse, HttpRequest
 from azure.core.tracing.decorator_async import distributed_trace_async
 from azure.core.utils import case_insensitive_dict
 
-from ...operations._operations import (
+from ...operations._connector_operations import (
     build_attachments_get_attachment_info_request,
     build_attachments_get_attachment_request,
     build_connector_internals_activity_event_names_request,

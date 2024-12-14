@@ -9,40 +9,33 @@ from typing import Any, Awaitable
 from typing_extensions import Self
 
 from azure.core import AsyncPipelineClient
+from azure.core.credentials import AzureKeyCredential
 from azure.core.pipeline import policies
 from azure.core.rest import AsyncHttpResponse, HttpRequest
 
 from .._serialization import Deserializer, Serializer
-from ._configuration import ConnectorConfiguration
-from .operations import AttachmentsOperations, ConnectorInternalsOperations, ConversationsOperations
+from ._user_token_client_configuration import TokenConfiguration
+from .operations import BotSignInOperations, TokenInternalsOperations, UserTokenOperations
 
 
-class Connector:  # pylint: disable=client-accepts-api-version-keyword
-    """The Azure Bot Service Connector APIs allow bots to send and receive
-    messages, button clicks, and other programmatic events when connecting with
-    end users. This API also includes facilities to get conversation metadata
-    and perform other operations (deletions and content editing). This REST API
-    may be used directly over HTTP and Web Socket, but is easiest to use with
-    the Azure SDK ConnectorClient.
+class Token:  # pylint: disable=client-accepts-api-version-keyword
+    """Token.
 
-    © 2020 Microsoft.
-
-    :ivar attachments: AttachmentsOperations operations
-    :vartype attachments: microsoft.agents.protocols.connector.aio.operations.AttachmentsOperations
-    :ivar conversations: ConversationsOperations operations
-    :vartype conversations:
-     microsoft.agents.protocols.connector.aio.operations.ConversationsOperations
-    :ivar connector_internals: ConnectorInternalsOperations operations
-    :vartype connector_internals:
-     microsoft.agents.protocols.connector.aio.operations.ConnectorInternalsOperations
+    :ivar bot_sign_in: BotSignInOperations operations
+    :vartype bot_sign_in: microsoft.agents.protocols.connector.aio.operations.BotSignInOperations
+    :ivar user_token: UserTokenOperations operations
+    :vartype user_token: microsoft.agents.protocols.connector.aio.operations.UserTokenOperations
+    :ivar token_internals: TokenInternalsOperations operations
+    :vartype token_internals:
+     microsoft.agents.protocols.connector.aio.operations.TokenInternalsOperations
+    :param credential: Credential needed for the client to connect to Azure. Required.
+    :type credential: ~azure.core.credentials.AzureKeyCredential
     :keyword endpoint: Service URL. Required. Default value is "".
     :paramtype endpoint: str
     """
 
-    def __init__(  # pylint: disable=missing-client-constructor-parameter-credential
-        self, *, endpoint: str = "", **kwargs: Any
-    ) -> None:
-        self._config = ConnectorConfiguration(**kwargs)
+    def __init__(self, credential: AzureKeyCredential, *, endpoint: str = "", **kwargs: Any) -> None:
+        self._config = TokenConfiguration(credential=credential, **kwargs)
         _policies = kwargs.pop("policies", None)
         if _policies is None:
             _policies = [
@@ -65,21 +58,19 @@ class Connector:  # pylint: disable=client-accepts-api-version-keyword
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
-        self.attachments = AttachmentsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.conversations = ConversationsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.connector_internals = ConnectorInternalsOperations(
-            self._client, self._config, self._serialize, self._deserialize
-        )
+        self.bot_sign_in = BotSignInOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.user_token = UserTokenOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.token_internals = TokenInternalsOperations(self._client, self._config, self._serialize, self._deserialize)
 
     def send_request(
         self, request: HttpRequest, *, stream: bool = False, **kwargs: Any
     ) -> Awaitable[AsyncHttpResponse]:
         """Runs the network request through the client's chained policies.
 
-        >>> from azure.core.rest import HttpRequest
-        >>> request = HttpRequest("GET", "https://www.example.org/")
+        >> from azure.core.rest import HttpRequest
+        >> request = HttpRequest("GET", "https://www.example.org/")
         <HttpRequest [GET], url: 'https://www.example.org/'>
-        >>> response = await client.send_request(request)
+        >> response = await client.send_request(request)
         <AsyncHttpResponse: 200 OK>
 
         For more information on this code flow, see https://aka.ms/azsdk/dpcodegen/python/send_request

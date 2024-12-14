@@ -6,6 +6,7 @@ setup(
     packages=find_namespace_packages(),
     install_requires=[
         "azure-core>=1.30.0",
+        "isodate>=0.6.1",
     ],
     author='Microsoft Corporation',
     description='A protocol library for Microsoft Agents',
