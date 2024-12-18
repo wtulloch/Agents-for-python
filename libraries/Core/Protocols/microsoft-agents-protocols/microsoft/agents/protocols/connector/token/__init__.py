@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._user_token_client_patch import *  # pylint: disable=unused-wildcard-import
 
-from ._user_token_client import Token  # type: ignore
+from ._user_token_client import UserTokenClient  # type: ignore
 
 try:
     from ._user_token_client_patch import __all__ as _patch_all
@@ -20,7 +20,7 @@ except ImportError:
 from ._user_token_client_patch import patch_sdk as _patch_sdk
 
 __all__ = [
-    "Token",
+    "UserTokenClient",
 ]
 __all__.extend([p for p in _patch_all if p not in __all__])  # pyright: ignore
 

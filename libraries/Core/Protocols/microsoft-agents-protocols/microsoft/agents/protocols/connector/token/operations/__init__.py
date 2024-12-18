@@ -5,23 +5,12 @@
 # --------------------------------------------------------------------------
 # pylint: disable=wrong-import-position
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from ._user_token_operations_patch import *  # pylint: disable=unused-wildcard-import
-
 from ._user_token_operations import BotSignInOperations  # type: ignore
 from ._user_token_operations import UserTokenOperations  # type: ignore
 from ._user_token_operations import TokenInternalsOperations  # type: ignore
-
-from ._user_token_operations_patch import __all__ as _patch_all
-from ._user_token_operations_patch import *
-from ._user_token_operations_patch import patch_sdk as _patch_sdk
 
 __all__ = [
     "BotSignInOperations",
     "UserTokenOperations",
     "TokenInternalsOperations",
 ]
-__all__.extend([p for p in _patch_all if p not in __all__])  # pyright: ignore
-_patch_sdk()

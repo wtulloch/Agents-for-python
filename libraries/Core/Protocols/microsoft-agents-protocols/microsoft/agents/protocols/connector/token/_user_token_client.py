@@ -18,7 +18,7 @@ from ._user_token_client_configuration import TokenConfiguration
 from .operations import BotSignInOperations, TokenInternalsOperations, UserTokenOperations
 
 
-class Token:  # pylint: disable=client-accepts-api-version-keyword
+class UserTokenClient:  # pylint: disable=client-accepts-api-version-keyword
     """Token.
 
     :ivar bot_sign_in: BotSignInOperations operations

@@ -5,23 +5,12 @@
 # --------------------------------------------------------------------------
 # pylint: disable=wrong-import-position
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from ._connector_operations_async_patch import *  # pylint: disable=unused-wildcard-import
-
-from ._connector_operations_async import AttachmentsOperations  # type: ignore
-from ._connector_operations_async import ConversationsOperations  # type: ignore
-from ._connector_operations_async import ConnectorInternalsOperations  # type: ignore
-
-from ._connector_operations_async_patch import __all__ as _patch_all
-from ._connector_operations_async_patch import *
-from ._connector_operations_async_patch import patch_sdk as _patch_sdk
+from ._connector_operations import AttachmentsOperations  # type: ignore
+from ._connector_operations import ConversationsOperations  # type: ignore
+from ._connector_operations import ConnectorInternalsOperations  # type: ignore
 
 __all__ = [
     "AttachmentsOperations",
     "ConversationsOperations",
     "ConnectorInternalsOperations",
 ]
-__all__.extend([p for p in _patch_all if p not in __all__])  # pyright: ignore
-_patch_sdk()
