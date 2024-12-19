@@ -1,7 +1,7 @@
 from .activity_types import ActivityTypes
 
-from .connector._connector_client import ConnectorClient  # type: ignore
-from .connector.token._user_token_client import UserTokenClient  # type: ignore
+from .connector.connector_client import ConnectorClient
+from .connector.token.user_token_client import UserTokenClient
 
 __all__ = [
     "ActivityTypes",

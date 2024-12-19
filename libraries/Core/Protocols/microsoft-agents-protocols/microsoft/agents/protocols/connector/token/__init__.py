@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._user_token_client_patch import *  # pylint: disable=unused-wildcard-import
 
-from ._user_token_client import UserTokenClient  # type: ignore
+from .user_token_client import UserTokenClient  # type: ignore
 
 try:
     from ._user_token_client_patch import __all__ as _patch_all

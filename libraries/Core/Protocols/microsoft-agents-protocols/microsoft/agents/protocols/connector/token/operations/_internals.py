@@ -17,24 +17,11 @@ from azure.core.exceptions import (
     map_error,
 )
 from azure.core.pipeline import PipelineResponse
-from azure.core.rest import AsyncHttpResponse, HttpRequest
-from azure.core.tracing.decorator_async import distributed_trace_async
+from azure.core.rest import HttpRequest, HttpResponse
+from azure.core.tracing.decorator import distributed_trace
 from azure.core.utils import case_insensitive_dict
 
-from ._internals import (
-    build_bot_sign_in_get_sign_in_resource_request,
-    build_bot_sign_in_get_sign_in_url_request,
-    build_token_internals_post_error_response_request,
-    build_token_internals_post_sign_in_url_response_request,
-    build_token_internals_post_token_exchange_resource_request,
-    build_token_internals_post_token_response_request,
-    build_token_internals_post_token_status_request,
-    build_user_token_exchange_token_request,
-    build_user_token_get_aad_tokens_request,
-    build_user_token_get_token_request,
-    build_user_token_get_token_status_request,
-    build_user_token_sign_out_request,
-)
+from .._serialization import Serializer
 
 if sys.version_info >= (3, 9):
     from collections.abc import MutableMapping
@@ -42,7 +29,285 @@ else:
     from typing import MutableMapping  # type: ignore
 JSON = MutableMapping[str, Any]  # pylint: disable=unsubscriptable-object
 T = TypeVar("T")
-ClsType = Optional[Callable[[PipelineResponse[HttpRequest, AsyncHttpResponse], T, Dict[str, Any]], Any]]
+ClsType = Optional[Callable[[PipelineResponse[HttpRequest, HttpResponse], T, Dict[str, Any]], Any]]
+
+_SERIALIZER = Serializer()
+_SERIALIZER.client_side_validation = False
+
+
+def build_bot_sign_in_get_sign_in_url_request(  # pylint: disable=name-too-long
+    *,
+    state: str,
+    code_challenge: Optional[str] = None,
+    emulator_url: Optional[str] = None,
+    final_redirect: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "text/plain")
+
+    # Construct URL
+    _url = "/api/botsignin/GetSignInUrl"
+
+    # Construct parameters
+    _params["state"] = _SERIALIZER.query("state", state, "str")
+    if code_challenge is not None:
+        _params["code_challenge"] = _SERIALIZER.query("code_challenge", code_challenge, "str")
+    if emulator_url is not None:
+        _params["emulatorUrl"] = _SERIALIZER.query("emulator_url", emulator_url, "str")
+    if final_redirect is not None:
+        _params["finalRedirect"] = _SERIALIZER.query("final_redirect", final_redirect, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
+
+
+def build_bot_sign_in_get_sign_in_resource_request(  # pylint: disable=name-too-long
+    *,
+    state: str,
+    code_challenge: Optional[str] = None,
+    emulator_url: Optional[str] = None,
+    final_redirect: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/api/botsignin/GetSignInResource"
+
+    # Construct parameters
+    _params["state"] = _SERIALIZER.query("state", state, "str")
+    if code_challenge is not None:
+        _params["code_challenge"] = _SERIALIZER.query("code_challenge", code_challenge, "str")
+    if emulator_url is not None:
+        _params["emulatorUrl"] = _SERIALIZER.query("emulator_url", emulator_url, "str")
+    if final_redirect is not None:
+        _params["finalRedirect"] = _SERIALIZER.query("final_redirect", final_redirect, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
+
+
+def build_user_token_get_token_request(
+    *, user_id: str, connection_name: str, channel_id: Optional[str] = None, code: Optional[str] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/api/usertoken/GetToken"
+
+    # Construct parameters
+    _params["userId"] = _SERIALIZER.query("user_id", user_id, "str")
+    _params["connectionName"] = _SERIALIZER.query("connection_name", connection_name, "str")
+    if channel_id is not None:
+        _params["channelId"] = _SERIALIZER.query("channel_id", channel_id, "str")
+    if code is not None:
+        _params["code"] = _SERIALIZER.query("code", code, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
+
+
+def build_user_token_get_aad_tokens_request(
+    *, user_id: str, connection_name: str, channel_id: Optional[str] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/api/usertoken/GetAadTokens"
+
+    # Construct parameters
+    _params["userId"] = _SERIALIZER.query("user_id", user_id, "str")
+    _params["connectionName"] = _SERIALIZER.query("connection_name", connection_name, "str")
+    if channel_id is not None:
+        _params["channelId"] = _SERIALIZER.query("channel_id", channel_id, "str")
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, params=_params, headers=_headers, **kwargs)
+
+
+def build_user_token_sign_out_request(
+    *, user_id: str, connection_name: Optional[str] = None, channel_id: Optional[str] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/api/usertoken/SignOut"
+
+    # Construct parameters
+    _params["userId"] = _SERIALIZER.query("user_id", user_id, "str")
+    if connection_name is not None:
+        _params["connectionName"] = _SERIALIZER.query("connection_name", connection_name, "str")
+    if channel_id is not None:
+        _params["channelId"] = _SERIALIZER.query("channel_id", channel_id, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, params=_params, headers=_headers, **kwargs)
+
+
+def build_user_token_get_token_status_request(  # pylint: disable=name-too-long
+    *, user_id: str, channel_id: Optional[str] = None, include: Optional[str] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/api/usertoken/GetTokenStatus"
+
+    # Construct parameters
+    _params["userId"] = _SERIALIZER.query("user_id", user_id, "str")
+    if channel_id is not None:
+        _params["channelId"] = _SERIALIZER.query("channel_id", channel_id, "str")
+    if include is not None:
+        _params["include"] = _SERIALIZER.query("include", include, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
+
+
+def build_user_token_exchange_token_request(
+    *, user_id: str, connection_name: str, channel_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/api/usertoken/exchange"
+
+    # Construct parameters
+    _params["userId"] = _SERIALIZER.query("user_id", user_id, "str")
+    _params["connectionName"] = _SERIALIZER.query("connection_name", connection_name, "str")
+    _params["channelId"] = _SERIALIZER.query("channel_id", channel_id, "str")
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, params=_params, headers=_headers, **kwargs)
+
+
+def build_token_internals_post_token_status_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v3/tokenInternals/tokenStatus"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_token_internals_post_token_exchange_resource_request(  # pylint: disable=name-too-long
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v3/tokenInternals/tokenExchangeResource"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_token_internals_post_token_response_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v3/tokenInternals/tokenResponse"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_token_internals_post_sign_in_url_response_request(  # pylint: disable=name-too-long
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v3/tokenInternals/signInUrlResponse"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_token_internals_post_error_response_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v3/tokenInternals/errorResponse"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
 class BotSignInOperations:
@@ -51,26 +316,26 @@ class BotSignInOperations:
         **DO NOT** instantiate this class directly.
 
         Instead, you should access the following operations through
-        :class:`~microsoft.agents.protocols.connector.aio.Token`'s
+        :class:`~microsoft.agents.protocols.connector.Token`'s
         :attr:`bot_sign_in` attribute.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         input_args = list(args)
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
         self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
 
-    @distributed_trace_async
-    async def get_sign_in_url(
+    @distributed_trace
+    def get_sign_in_url(
         self,
         *,
         state: str,
         code_challenge: Optional[str] = None,
         emulator_url: Optional[str] = None,
         final_redirect: Optional[str] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> str:
         """get_sign_in_url.
 
@@ -110,7 +375,7 @@ class BotSignInOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -130,15 +395,15 @@ class BotSignInOperations:
 
         return cast(str, deserialized)  # type: ignore
 
-    @distributed_trace_async
-    async def get_sign_in_resource(
+    @distributed_trace
+    def get_sign_in_resource(
         self,
         *,
         state: str,
         code_challenge: Optional[str] = None,
         emulator_url: Optional[str] = None,
         final_redirect: Optional[str] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> JSON:
         """get_sign_in_resource.
 
@@ -191,7 +456,7 @@ class BotSignInOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -218,26 +483,26 @@ class UserTokenOperations:
         **DO NOT** instantiate this class directly.
 
         Instead, you should access the following operations through
-        :class:`~microsoft.agents.protocols.connector.aio.Token`'s
+        :class:`~microsoft.agents.protocols.connector.Token`'s
         :attr:`user_token` attribute.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         input_args = list(args)
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
         self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
 
-    @distributed_trace_async
-    async def get_token(
+    @distributed_trace
+    def get_token(
         self,
         *,
         user_id: str,
         connection_name: str,
         channel_id: Optional[str] = None,
         code: Optional[str] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> JSON:
         """get_token.
 
@@ -288,7 +553,7 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -309,7 +574,7 @@ class UserTokenOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @overload
-    async def get_aad_tokens(
+    def get_aad_tokens(
         self,
         body: Optional[JSON] = None,
         *,
@@ -317,7 +582,7 @@ class UserTokenOperations:
         connection_name: str,
         channel_id: Optional[str] = None,
         content_type: str = "application/json",
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Dict[str, JSON]:
         """get_aad_tokens.
 
@@ -358,7 +623,7 @@ class UserTokenOperations:
         """
 
     @overload
-    async def get_aad_tokens(
+    def get_aad_tokens(
         self,
         body: Optional[IO[bytes]] = None,
         *,
@@ -366,7 +631,7 @@ class UserTokenOperations:
         connection_name: str,
         channel_id: Optional[str] = None,
         content_type: str = "application/json",
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Dict[str, JSON]:
         """get_aad_tokens.
 
@@ -399,15 +664,15 @@ class UserTokenOperations:
                 }
         """
 
-    @distributed_trace_async
-    async def get_aad_tokens(
+    @distributed_trace
+    def get_aad_tokens(
         self,
         body: Optional[Union[JSON, IO[bytes]]] = None,
         *,
         user_id: str,
         connection_name: str,
         channel_id: Optional[str] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Dict[str, JSON]:
         """get_aad_tokens.
 
@@ -481,7 +746,7 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -501,8 +766,8 @@ class UserTokenOperations:
 
         return cast(Dict[str, JSON], deserialized)  # type: ignore
 
-    @distributed_trace_async
-    async def sign_out(
+    @distributed_trace
+    def sign_out(
         self, *, user_id: str, connection_name: Optional[str] = None, channel_id: Optional[str] = None, **kwargs: Any
     ) -> Optional[JSON]:
         """sign_out.
@@ -540,7 +805,7 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -562,8 +827,8 @@ class UserTokenOperations:
 
         return deserialized  # type: ignore
 
-    @distributed_trace_async
-    async def get_token_status(
+    @distributed_trace
+    def get_token_status(
         self, *, user_id: str, channel_id: Optional[str] = None, include: Optional[str] = None, **kwargs: Any
     ) -> List[JSON]:
         """get_token_status.
@@ -614,7 +879,7 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -635,7 +900,7 @@ class UserTokenOperations:
         return cast(List[JSON], deserialized)  # type: ignore
 
     @overload
-    async def exchange_token(
+    def exchange_token(
         self,
         body: Optional[JSON] = None,
         *,
@@ -643,7 +908,7 @@ class UserTokenOperations:
         connection_name: str,
         channel_id: str,
         content_type: str = "application/json",
-        **kwargs: Any
+        **kwargs: Any,
     ) -> JSON:
         """exchange_token.
 
@@ -681,7 +946,7 @@ class UserTokenOperations:
         """
 
     @overload
-    async def exchange_token(
+    def exchange_token(
         self,
         body: Optional[IO[bytes]] = None,
         *,
@@ -689,7 +954,7 @@ class UserTokenOperations:
         connection_name: str,
         channel_id: str,
         content_type: str = "application/json",
-        **kwargs: Any
+        **kwargs: Any,
     ) -> JSON:
         """exchange_token.
 
@@ -720,15 +985,15 @@ class UserTokenOperations:
                 }
         """
 
-    @distributed_trace_async
-    async def exchange_token(
+    @distributed_trace
+    def exchange_token(
         self,
         body: Optional[Union[JSON, IO[bytes]]] = None,
         *,
         user_id: str,
         connection_name: str,
         channel_id: str,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> JSON:
         """exchange_token.
 
@@ -799,7 +1064,7 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -826,11 +1091,11 @@ class TokenInternalsOperations:
         **DO NOT** instantiate this class directly.
 
         Instead, you should access the following operations through
-        :class:`~microsoft.agents.protocols.connector.aio.Token`'s
+        :class:`~microsoft.agents.protocols.connector.Token`'s
         :attr:`token_internals` attribute.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         input_args = list(args)
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
@@ -838,7 +1103,7 @@ class TokenInternalsOperations:
         self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
 
     @overload
-    async def post_token_status(
+    def post_token_status(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenStatus.
@@ -867,7 +1132,7 @@ class TokenInternalsOperations:
         """
 
     @overload
-    async def post_token_status(
+    def post_token_status(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenStatus.
@@ -884,8 +1149,10 @@ class TokenInternalsOperations:
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace_async
-    async def post_token_status(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    @distributed_trace
+    def post_token_status(  # pylint: disable=inconsistent-return-statements
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostTokenStatus.
 
         PostTokenStatus.
@@ -942,7 +1209,7 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -956,7 +1223,7 @@ class TokenInternalsOperations:
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    async def post_token_exchange_resource(
+    def post_token_exchange_resource(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeResource.
@@ -984,7 +1251,7 @@ class TokenInternalsOperations:
         """
 
     @overload
-    async def post_token_exchange_resource(
+    def post_token_exchange_resource(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenExchangeResource.
@@ -1001,8 +1268,10 @@ class TokenInternalsOperations:
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace_async
-    async def post_token_exchange_resource(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    @distributed_trace
+    def post_token_exchange_resource(  # pylint: disable=inconsistent-return-statements
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostTokenExchangeResource.
 
         PostTokenExchangeResource.
@@ -1059,7 +1328,7 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -1073,7 +1342,7 @@ class TokenInternalsOperations:
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    async def post_token_response(
+    def post_token_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenResponse.
@@ -1102,7 +1371,7 @@ class TokenInternalsOperations:
         """
 
     @overload
-    async def post_token_response(
+    def post_token_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostTokenResponse.
@@ -1119,8 +1388,10 @@ class TokenInternalsOperations:
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace_async
-    async def post_token_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    @distributed_trace
+    def post_token_response(  # pylint: disable=inconsistent-return-statements
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostTokenResponse.
 
         PostTokenResponse.
@@ -1177,7 +1448,7 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -1191,7 +1462,7 @@ class TokenInternalsOperations:
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    async def post_sign_in_url_response(
+    def post_sign_in_url_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostSignInUrlResponse.
@@ -1222,7 +1493,7 @@ class TokenInternalsOperations:
         """
 
     @overload
-    async def post_sign_in_url_response(
+    def post_sign_in_url_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostSignInUrlResponse.
@@ -1239,8 +1510,10 @@ class TokenInternalsOperations:
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace_async
-    async def post_sign_in_url_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    @distributed_trace
+    def post_sign_in_url_response(  # pylint: disable=inconsistent-return-statements
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostSignInUrlResponse.
 
         PostSignInUrlResponse.
@@ -1300,7 +1573,7 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
@@ -1314,7 +1587,7 @@ class TokenInternalsOperations:
             return cls(pipeline_response, None, {})  # type: ignore
 
     @overload
-    async def post_error_response(
+    def post_error_response(
         self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostErrorResponse.
@@ -1347,7 +1620,7 @@ class TokenInternalsOperations:
         """
 
     @overload
-    async def post_error_response(
+    def post_error_response(
         self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
     ) -> None:
         """PostErrorResponse.
@@ -1364,8 +1637,10 @@ class TokenInternalsOperations:
         :raises ~azure.core.exceptions.HttpResponseError:
         """
 
-    @distributed_trace_async
-    async def post_error_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    @distributed_trace
+    def post_error_response(  # pylint: disable=inconsistent-return-statements
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostErrorResponse.
 
         PostErrorResponse.
@@ -1426,7 +1701,7 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
+        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
             _request, stream=_stream, **kwargs
         )
 
