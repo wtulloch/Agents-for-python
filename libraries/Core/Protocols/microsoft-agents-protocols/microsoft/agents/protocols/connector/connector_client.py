@@ -14,7 +14,11 @@ from azure.core.rest import AsyncHttpResponse, HttpRequest
 
 from microsoft.agents.protocols.connector._serialization import Deserializer, Serializer
 from ._connector_client_configuration import ConnectorConfiguration
-from .operations import AttachmentsOperations, ConnectorInternalsOperations, ConversationsOperations
+from .operations import (
+    AttachmentsOperations,
+    ConnectorInternalsOperations,
+    ConversationsOperations,
+)
 
 
 class ConnectorClient:  # pylint: disable=client-accepts-api-version-keyword
@@ -57,16 +61,26 @@ class ConnectorClient:  # pylint: disable=client-accepts-api-version-keyword
                 self._config.custom_hook_policy,
                 self._config.logging_policy,
                 policies.DistributedTracingPolicy(**kwargs),
-                policies.SensitiveHeaderCleanupPolicy(**kwargs) if self._config.redirect_policy else None,
+                (
+                    policies.SensitiveHeaderCleanupPolicy(**kwargs)
+                    if self._config.redirect_policy
+                    else None
+                ),
                 self._config.http_logging_policy,
             ]
-        self._client: AsyncPipelineClient = AsyncPipelineClient(base_url=endpoint, policies=_policies, **kwargs)
+        self._client: AsyncPipelineClient = AsyncPipelineClient(
+            base_url=endpoint, policies=_policies, **kwargs
+        )
 
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
-        self.attachments = AttachmentsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.conversations = ConversationsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.attachments = AttachmentsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.conversations = ConversationsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.connector_internals = ConnectorInternalsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )

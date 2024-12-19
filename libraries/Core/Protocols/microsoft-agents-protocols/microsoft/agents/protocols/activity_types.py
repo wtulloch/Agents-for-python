@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ActivityTypes(str, Enum):
     message = "message"
     contact_relation_update = "contactRelationUpdate"

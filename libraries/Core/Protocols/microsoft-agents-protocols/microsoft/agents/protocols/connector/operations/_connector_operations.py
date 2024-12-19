@@ -6,7 +6,19 @@
 # --------------------------------------------------------------------------
 from io import IOBase
 import sys
-from typing import Any, AsyncIterator, Callable, Dict, IO, List, Optional, TypeVar, Union, cast, overload
+from typing import (
+    Any,
+    AsyncIterator,
+    Callable,
+    Dict,
+    IO,
+    List,
+    Optional,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 from azure.core.exceptions import (
     ClientAuthenticationError,
@@ -78,7 +90,9 @@ else:
     from typing import MutableMapping  # type: ignore
 JSON = MutableMapping[str, Any]  # pylint: disable=unsubscriptable-object
 T = TypeVar("T")
-ClsType = Optional[Callable[[PipelineResponse[HttpRequest, AsyncHttpResponse], T, Dict[str, Any]], Any]]
+ClsType = Optional[
+    Callable[[PipelineResponse[HttpRequest, AsyncHttpResponse], T, Dict[str, Any]], Any]
+]
 
 
 class AttachmentsOperations:
@@ -96,7 +110,9 @@ class AttachmentsOperations:
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
 
     @distributed_trace_async
     async def get_attachment_info(self, attachment_id: str, **kwargs: Any) -> JSON:
@@ -146,14 +162,18 @@ class AttachmentsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -167,7 +187,9 @@ class AttachmentsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace_async
-    async def get_attachment(self, attachment_id: str, view_id: str, **kwargs: Any) -> Optional[AsyncIterator[bytes]]:
+    async def get_attachment(
+        self, attachment_id: str, view_id: str, **kwargs: Any
+    ) -> Optional[AsyncIterator[bytes]]:
         """GetAttachment.
 
         Get the named view as binary content.
@@ -202,8 +224,10 @@ class AttachmentsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = True
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
@@ -213,7 +237,9 @@ class AttachmentsOperations:
                 await response.read()  # Load the body in memory and close the socket
             except (StreamConsumedError, StreamClosedError):
                 pass
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         deserialized = None
@@ -241,10 +267,14 @@ class ConversationsOperations:
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
 
     @distributed_trace_async
-    async def get_conversations(self, *, continuation_token_parameter: Optional[str] = None, **kwargs: Any) -> JSON:
+    async def get_conversations(
+        self, *, continuation_token_parameter: Optional[str] = None, **kwargs: Any
+    ) -> JSON:
         """GetConversations.
 
         List the Conversations in which this bot has participated.
@@ -307,14 +337,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -329,7 +363,11 @@ class ConversationsOperations:
 
     @overload
     async def create_conversation(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> JSON:
         """CreateConversation.
 
@@ -553,7 +591,11 @@ class ConversationsOperations:
 
     @overload
     async def create_conversation(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> JSON:
         """CreateConversation.
 
@@ -601,7 +643,9 @@ class ConversationsOperations:
         """
 
     @distributed_trace_async
-    async def create_conversation(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> JSON:
+    async def create_conversation(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> JSON:
         """CreateConversation.
 
         Create a new Conversation.
@@ -830,7 +874,9 @@ class ConversationsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -854,14 +900,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 201, 202]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -1123,7 +1173,10 @@ class ConversationsOperations:
 
     @distributed_trace_async
     async def send_to_conversation(
-        self, conversation_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+        self,
+        conversation_id: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
     ) -> JSON:
         """SendToConversation.
 
@@ -1325,7 +1378,9 @@ class ConversationsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -1350,14 +1405,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 201, 202]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -1605,7 +1664,10 @@ class ConversationsOperations:
 
     @distributed_trace_async
     async def send_conversation_history(
-        self, conversation_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+        self,
+        conversation_id: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
     ) -> JSON:
         """SendConversationHistory.
 
@@ -1802,7 +1864,9 @@ class ConversationsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -1827,14 +1891,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 201, 202]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -2086,7 +2154,11 @@ class ConversationsOperations:
 
     @distributed_trace_async
     async def update_activity(
-        self, conversation_id: str, activity_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+        self,
+        conversation_id: str,
+        activity_id: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
     ) -> JSON:
         """UpdateActivity.
 
@@ -2282,7 +2354,9 @@ class ConversationsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -2308,14 +2382,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 201, 202]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -2583,7 +2661,11 @@ class ConversationsOperations:
 
     @distributed_trace_async
     async def reply_to_activity(
-        self, conversation_id: str, activity_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+        self,
+        conversation_id: str,
+        activity_id: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
     ) -> JSON:
         """ReplyToActivity.
 
@@ -2787,7 +2869,9 @@ class ConversationsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -2813,14 +2897,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 201, 202]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -2834,7 +2922,9 @@ class ConversationsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace_async
-    async def delete_activity(self, conversation_id: str, activity_id: str, **kwargs: Any) -> None:
+    async def delete_activity(
+        self, conversation_id: str, activity_id: str, **kwargs: Any
+    ) -> None:
         """DeleteActivity.
 
         Delete an existing activity.
@@ -2872,21 +2962,27 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 202]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
             return cls(pipeline_response, None, {})  # type: ignore
 
     @distributed_trace_async
-    async def get_conversation_members(self, conversation_id: str, **kwargs: Any) -> List[JSON]:
+    async def get_conversation_members(
+        self, conversation_id: str, **kwargs: Any
+    ) -> List[JSON]:
         """GetConversationMembers.
 
         Enumerate the members of a conversation.
@@ -2934,14 +3030,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -2955,7 +3055,9 @@ class ConversationsOperations:
         return cast(List[JSON], deserialized)  # type: ignore
 
     @distributed_trace_async
-    async def get_conversation_member(self, conversation_id: str, member_id: str, **kwargs: Any) -> JSON:
+    async def get_conversation_member(
+        self, conversation_id: str, member_id: str, **kwargs: Any
+    ) -> JSON:
         """GetConversationMember.
 
         Get a single member of a conversation.
@@ -3004,14 +3106,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -3025,7 +3131,9 @@ class ConversationsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace_async
-    async def delete_conversation_member(self, conversation_id: str, member_id: str, **kwargs: Any) -> None:
+    async def delete_conversation_member(
+        self, conversation_id: str, member_id: str, **kwargs: Any
+    ) -> None:
         """DeleteConversationMember.
 
         Deletes a member from a conversation.
@@ -3064,14 +3172,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 204]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -3153,14 +3265,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -3174,7 +3290,9 @@ class ConversationsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace_async
-    async def get_activity_members(self, conversation_id: str, activity_id: str, **kwargs: Any) -> List[JSON]:
+    async def get_activity_members(
+        self, conversation_id: str, activity_id: str, **kwargs: Any
+    ) -> List[JSON]:
         """GetActivityMembers.
 
         Enumerate the members of an activity.
@@ -3225,14 +3343,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -3333,7 +3455,10 @@ class ConversationsOperations:
 
     @distributed_trace_async
     async def upload_attachment(
-        self, conversation_id: str, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+        self,
+        conversation_id: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
     ) -> JSON:
         """UploadAttachment.
 
@@ -3380,7 +3505,9 @@ class ConversationsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -3405,14 +3532,18 @@ class ConversationsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 201, 202]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -3441,11 +3572,17 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
 
     @overload
     async def activity(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostActivity.
 
@@ -3621,7 +3758,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def activity(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostActivity.
 
@@ -3638,7 +3779,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def activity(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def activity(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostActivity.
 
         PostActivity.
@@ -3818,7 +3961,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -3842,21 +3987,27 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
             return cls(pipeline_response, None, {})  # type: ignore
 
     @distributed_trace_async
-    async def activity_event_names(self, body: Optional[str] = None, **kwargs: Any) -> None:
+    async def activity_event_names(
+        self, body: Optional[str] = None, **kwargs: Any
+    ) -> None:
         """PostActivityEventNames.
 
         PostActivityEventNames.
@@ -3879,7 +4030,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: str = kwargs.pop("content_type", _headers.pop("Content-Type", "application/json"))
+        content_type: str = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", "application/json")
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         if body is not None:
@@ -3896,14 +4049,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -3911,7 +4068,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def expected_replies(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostExpectedReplies.
 
@@ -4091,7 +4252,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def expected_replies(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostExpectedReplies.
 
@@ -4108,7 +4273,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def expected_replies(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def expected_replies(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostExpectedReplies.
 
         PostExpectedReplies.
@@ -4292,7 +4459,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -4316,14 +4485,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -4331,7 +4504,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def animation_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAnimationCard.
 
@@ -4387,7 +4564,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def animation_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAnimationCard.
 
@@ -4404,7 +4585,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def animation_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def animation_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostAnimationCard.
 
         PostAnimationCard.
@@ -4464,7 +4647,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -4488,14 +4673,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -4503,7 +4692,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def audio_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAudioCard.
 
@@ -4559,7 +4752,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def audio_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAudioCard.
 
@@ -4576,7 +4773,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def audio_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def audio_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostAudioCard.
 
         PostAudioCard.
@@ -4636,7 +4835,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -4660,14 +4861,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -4675,7 +4880,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def basic_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostBasicCard.
 
@@ -4741,7 +4950,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def basic_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostBasicCard.
 
@@ -4758,7 +4971,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def basic_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def basic_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostBasicCard.
 
         PostBasicCard.
@@ -4828,7 +5043,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -4852,14 +5069,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -4867,7 +5088,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def hero_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostHeroCard.
 
@@ -4933,7 +5158,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def hero_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostHeroCard.
 
@@ -4950,7 +5179,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def hero_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def hero_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostHeroCard.
 
         PostHeroCard.
@@ -5020,7 +5251,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -5044,14 +5277,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -5059,7 +5296,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def media_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostMediaCard.
 
@@ -5115,7 +5356,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def media_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostMediaCard.
 
@@ -5132,7 +5377,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def media_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def media_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostMediaCard.
 
         PostMediaCard.
@@ -5192,7 +5439,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -5216,14 +5465,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -5231,7 +5484,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def o_auth_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostOAuthCard.
 
@@ -5275,7 +5532,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def o_auth_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostOAuthCard.
 
@@ -5292,7 +5553,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def o_auth_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def o_auth_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostOAuthCard.
 
         PostOAuthCard.
@@ -5340,7 +5603,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -5364,14 +5629,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -5379,7 +5648,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def receipt_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostReceiptCard.
 
@@ -5469,7 +5742,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def receipt_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostReceiptCard.
 
@@ -5486,7 +5763,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def receipt_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def receipt_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostReceiptCard.
 
         PostReceiptCard.
@@ -5580,7 +5859,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -5604,14 +5885,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -5619,7 +5904,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def signin_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostSigninCard.
 
@@ -5657,7 +5946,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def signin_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostSigninCard.
 
@@ -5674,7 +5967,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def signin_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def signin_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostSigninCard.
 
         PostSigninCard.
@@ -5716,7 +6011,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -5740,14 +6037,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -5755,7 +6056,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def thumbnail_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostThumbnailCard.
 
@@ -5821,7 +6126,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def thumbnail_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostThumbnailCard.
 
@@ -5838,7 +6147,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def thumbnail_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def thumbnail_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostThumbnailCard.
 
         PostThumbnailCard.
@@ -5908,7 +6219,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -5932,14 +6245,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -5947,7 +6264,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def video_card(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostVideoCard.
 
@@ -6003,7 +6324,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def video_card(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostVideoCard.
 
@@ -6020,7 +6345,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def video_card(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def video_card(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostVideoCard.
 
         PostVideoCard.
@@ -6080,7 +6407,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -6104,14 +6433,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -6119,7 +6452,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def mention(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostMention.
 
@@ -6152,7 +6489,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def mention(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostMention.
 
@@ -6169,7 +6510,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def mention(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def mention(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostMention.
 
         PostMention.
@@ -6206,7 +6549,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -6230,14 +6575,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -6245,7 +6594,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_exchange_state(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenExchangeState.
 
@@ -6326,7 +6679,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_exchange_state(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenExchangeState.
 
@@ -6343,7 +6700,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def token_exchange_state(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def token_exchange_state(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostTokenExchangeState.
 
         PostTokenExchangeState.
@@ -6429,7 +6788,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -6453,14 +6814,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -6468,7 +6833,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_exchange_resource(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenExchangeResource.
 
@@ -6496,7 +6865,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_exchange_resource(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenExchangeResource.
 
@@ -6513,7 +6886,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def token_exchange_resource(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def token_exchange_resource(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostTokenExchangeResource.
 
         PostTokenExchangeResource.
@@ -6546,7 +6921,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -6570,14 +6947,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -6585,7 +6966,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_exchange_invoke_request(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenExchangeInvokeRequest.
 
@@ -6612,7 +6997,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_exchange_invoke_request(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenExchangeInvokeRequest.
 
@@ -6629,7 +7018,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def token_exchange_invoke_request(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def token_exchange_invoke_request(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostTokenExchangeInvokeRequest.
 
         PostTokenExchangeInvokeRequest.
@@ -6661,7 +7052,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -6685,14 +7078,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -6700,7 +7097,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_exchange_invoke_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenExchangeInvokeResponse.
 
@@ -6727,7 +7128,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_exchange_invoke_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenExchangeInvokeResponse.
 
@@ -6778,7 +7183,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -6802,14 +7209,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -6817,7 +7228,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def invoke_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostInvokeResponse.
 
@@ -6844,7 +7259,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def invoke_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostInvokeResponse.
 
@@ -6861,7 +7280,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def invoke_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def invoke_response(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostInvokeResponse.
 
         PostInvokeResponse.
@@ -6892,7 +7313,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -6916,14 +7339,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -6931,7 +7358,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenResponse.
 
@@ -6960,7 +7391,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def token_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostTokenResponse.
 
@@ -6977,7 +7412,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def token_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def token_response(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostTokenResponse.
 
         PostTokenResponse.
@@ -7010,7 +7447,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -7034,14 +7473,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -7049,7 +7492,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def resource_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostResourceResponse.
 
@@ -7075,7 +7522,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def resource_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostResourceResponse.
 
@@ -7092,7 +7543,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def resource_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def resource_response(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostResourceResponse.
 
         PostResourceResponse.
@@ -7123,7 +7576,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -7147,14 +7602,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -7162,7 +7621,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def adaptive_card_invoke_action(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeAction.
 
@@ -7191,7 +7654,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def adaptive_card_invoke_action(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeAction.
 
@@ -7208,7 +7675,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def adaptive_card_invoke_action(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def adaptive_card_invoke_action(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostAdaptiveCardInvokeAction.
 
         PostAdaptiveCardInvokeAction.
@@ -7242,7 +7711,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -7266,14 +7737,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -7281,7 +7756,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def adaptive_card_invoke_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeResponse.
 
@@ -7309,7 +7788,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def adaptive_card_invoke_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeResponse.
 
@@ -7326,7 +7809,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def adaptive_card_invoke_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def adaptive_card_invoke_response(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostAdaptiveCardInvokeResponse.
 
         PostAdaptiveCardInvokeResponse.
@@ -7359,7 +7844,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -7383,14 +7870,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -7398,7 +7889,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def adaptive_card_invoke_value(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeValue.
 
@@ -7434,7 +7929,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def adaptive_card_invoke_value(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAdaptiveCardInvokeValue.
 
@@ -7451,7 +7950,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def adaptive_card_invoke_value(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def adaptive_card_invoke_value(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostAdaptiveCardInvokeValue.
 
         PostAdaptiveCardInvokeValue.
@@ -7492,7 +7993,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -7516,14 +8019,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -7531,7 +8038,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def search_invoke_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostSearchInvokeResponse.
 
@@ -7559,7 +8070,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def search_invoke_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostSearchInvokeResponse.
 
@@ -7576,7 +8091,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def search_invoke_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def search_invoke_response(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostSearchInvokeResponse.
 
         PostSearchInvokeResponse.
@@ -7609,7 +8126,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -7633,14 +8152,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -7648,7 +8171,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def search_invoke_value(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostSearchInvokeValue.
 
@@ -7677,7 +8204,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def search_invoke_value(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostSearchInvokeValue.
 
@@ -7694,7 +8225,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def search_invoke_value(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def search_invoke_value(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostSearchInvokeValue.
 
         PostSearchInvokeValue.
@@ -7728,7 +8261,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -7752,14 +8287,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -7767,7 +8306,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def conversations_result(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostConversationsResult.
 
@@ -7806,7 +8349,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def conversations_result(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostConversationsResult.
 
@@ -7823,7 +8370,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def conversations_result(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def conversations_result(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostConversationsResult.
 
         PostConversationsResult.
@@ -7867,7 +8416,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -7891,14 +8442,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -7906,7 +8461,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def paged_members_result(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostPagedMembersResult.
 
@@ -7940,7 +8499,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def paged_members_result(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostPagedMembersResult.
 
@@ -7957,7 +8520,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def paged_members_result(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def paged_members_result(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostPagedMembersResult.
 
         PostPagedMembersResult.
@@ -7996,7 +8561,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -8020,14 +8587,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -8035,7 +8606,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def attachment_info(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAttachmentInfo.
 
@@ -8068,7 +8643,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def attachment_info(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostAttachmentInfo.
 
@@ -8085,7 +8664,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def attachment_info(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def attachment_info(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostAttachmentInfo.
 
         PostAttachmentInfo.
@@ -8122,7 +8703,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -8146,14 +8729,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -8161,7 +8748,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def conversation_resource_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostConversationResourceResponse.
 
@@ -8189,7 +8780,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def conversation_resource_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostConversationResourceResponse.
 
@@ -8241,7 +8836,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -8265,14 +8862,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -8280,7 +8881,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def post_error_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostErrorResponse.
 
@@ -8313,7 +8918,11 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
 
     @overload
     async def post_error_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
     ) -> None:
         """PostErrorResponse.
 
@@ -8330,7 +8939,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         """
 
     @distributed_trace_async
-    async def post_error_response(self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any) -> None:
+    async def post_error_response(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> None:
         """PostErrorResponse.
 
         PostErrorResponse.
@@ -8367,7 +8978,9 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -8391,14 +9004,18 @@ class ConnectorInternalsOperations:  # pylint: disable=too-many-public-methods
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = await self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:

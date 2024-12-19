@@ -15,7 +15,11 @@ from azure.core.rest import AsyncHttpResponse, HttpRequest
 
 from .._serialization import Deserializer, Serializer
 from ._user_token_client_configuration import TokenConfiguration
-from .operations import BotSignInOperations, TokenInternalsOperations, UserTokenOperations
+from .operations import (
+    BotSignInOperations,
+    TokenInternalsOperations,
+    UserTokenOperations,
+)
 
 
 class UserTokenClient:  # pylint: disable=client-accepts-api-version-keyword
@@ -34,7 +38,9 @@ class UserTokenClient:  # pylint: disable=client-accepts-api-version-keyword
     :paramtype endpoint: str
     """
 
-    def __init__(self, credential: AzureKeyCredential, *, endpoint: str = "", **kwargs: Any) -> None:
+    def __init__(
+        self, credential: AzureKeyCredential, *, endpoint: str = "", **kwargs: Any
+    ) -> None:
         self._config = TokenConfiguration(credential=credential, **kwargs)
         _policies = kwargs.pop("policies", None)
         if _policies is None:
@@ -50,17 +56,29 @@ class UserTokenClient:  # pylint: disable=client-accepts-api-version-keyword
                 self._config.custom_hook_policy,
                 self._config.logging_policy,
                 policies.DistributedTracingPolicy(**kwargs),
-                policies.SensitiveHeaderCleanupPolicy(**kwargs) if self._config.redirect_policy else None,
+                (
+                    policies.SensitiveHeaderCleanupPolicy(**kwargs)
+                    if self._config.redirect_policy
+                    else None
+                ),
                 self._config.http_logging_policy,
             ]
-        self._client: AsyncPipelineClient = AsyncPipelineClient(base_url=endpoint, policies=_policies, **kwargs)
+        self._client: AsyncPipelineClient = AsyncPipelineClient(
+            base_url=endpoint, policies=_policies, **kwargs
+        )
 
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
-        self.bot_sign_in = BotSignInOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.user_token = UserTokenOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.token_internals = TokenInternalsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.bot_sign_in = BotSignInOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.user_token = UserTokenOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.token_internals = TokenInternalsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
 
     def send_request(
         self, request: HttpRequest, *, stream: bool = False, **kwargs: Any

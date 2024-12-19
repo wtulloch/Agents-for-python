@@ -6,7 +6,18 @@
 # --------------------------------------------------------------------------
 from io import IOBase
 import sys
-from typing import Any, Callable, Dict, IO, List, Optional, TypeVar, Union, cast, overload
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    IO,
+    List,
+    Optional,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 from azure.core.exceptions import (
     ClientAuthenticationError,
@@ -29,7 +40,9 @@ else:
     from typing import MutableMapping  # type: ignore
 JSON = MutableMapping[str, Any]  # pylint: disable=unsubscriptable-object
 T = TypeVar("T")
-ClsType = Optional[Callable[[PipelineResponse[HttpRequest, HttpResponse], T, Dict[str, Any]], Any]]
+ClsType = Optional[
+    Callable[[PipelineResponse[HttpRequest, HttpResponse], T, Dict[str, Any]], Any]
+]
 
 _SERIALIZER = Serializer()
 _SERIALIZER.client_side_validation = False
@@ -54,16 +67,22 @@ def build_bot_sign_in_get_sign_in_url_request(  # pylint: disable=name-too-long
     # Construct parameters
     _params["state"] = _SERIALIZER.query("state", state, "str")
     if code_challenge is not None:
-        _params["code_challenge"] = _SERIALIZER.query("code_challenge", code_challenge, "str")
+        _params["code_challenge"] = _SERIALIZER.query(
+            "code_challenge", code_challenge, "str"
+        )
     if emulator_url is not None:
         _params["emulatorUrl"] = _SERIALIZER.query("emulator_url", emulator_url, "str")
     if final_redirect is not None:
-        _params["finalRedirect"] = _SERIALIZER.query("final_redirect", final_redirect, "str")
+        _params["finalRedirect"] = _SERIALIZER.query(
+            "final_redirect", final_redirect, "str"
+        )
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
-    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
 
 
 def build_bot_sign_in_get_sign_in_resource_request(  # pylint: disable=name-too-long
@@ -85,20 +104,31 @@ def build_bot_sign_in_get_sign_in_resource_request(  # pylint: disable=name-too-
     # Construct parameters
     _params["state"] = _SERIALIZER.query("state", state, "str")
     if code_challenge is not None:
-        _params["code_challenge"] = _SERIALIZER.query("code_challenge", code_challenge, "str")
+        _params["code_challenge"] = _SERIALIZER.query(
+            "code_challenge", code_challenge, "str"
+        )
     if emulator_url is not None:
         _params["emulatorUrl"] = _SERIALIZER.query("emulator_url", emulator_url, "str")
     if final_redirect is not None:
-        _params["finalRedirect"] = _SERIALIZER.query("final_redirect", final_redirect, "str")
+        _params["finalRedirect"] = _SERIALIZER.query(
+            "final_redirect", final_redirect, "str"
+        )
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
-    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
 
 
 def build_user_token_get_token_request(
-    *, user_id: str, connection_name: str, channel_id: Optional[str] = None, code: Optional[str] = None, **kwargs: Any
+    *,
+    user_id: str,
+    connection_name: str,
+    channel_id: Optional[str] = None,
+    code: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -110,7 +140,9 @@ def build_user_token_get_token_request(
 
     # Construct parameters
     _params["userId"] = _SERIALIZER.query("user_id", user_id, "str")
-    _params["connectionName"] = _SERIALIZER.query("connection_name", connection_name, "str")
+    _params["connectionName"] = _SERIALIZER.query(
+        "connection_name", connection_name, "str"
+    )
     if channel_id is not None:
         _params["channelId"] = _SERIALIZER.query("channel_id", channel_id, "str")
     if code is not None:
@@ -119,16 +151,24 @@ def build_user_token_get_token_request(
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
-    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
 
 
 def build_user_token_get_aad_tokens_request(
-    *, user_id: str, connection_name: str, channel_id: Optional[str] = None, **kwargs: Any
+    *,
+    user_id: str,
+    connection_name: str,
+    channel_id: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -136,20 +176,30 @@ def build_user_token_get_aad_tokens_request(
 
     # Construct parameters
     _params["userId"] = _SERIALIZER.query("user_id", user_id, "str")
-    _params["connectionName"] = _SERIALIZER.query("connection_name", connection_name, "str")
+    _params["connectionName"] = _SERIALIZER.query(
+        "connection_name", connection_name, "str"
+    )
     if channel_id is not None:
         _params["channelId"] = _SERIALIZER.query("channel_id", channel_id, "str")
 
     # Construct headers
     if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
-    return HttpRequest(method="POST", url=_url, params=_params, headers=_headers, **kwargs)
+    return HttpRequest(
+        method="POST", url=_url, params=_params, headers=_headers, **kwargs
+    )
 
 
 def build_user_token_sign_out_request(
-    *, user_id: str, connection_name: Optional[str] = None, channel_id: Optional[str] = None, **kwargs: Any
+    *,
+    user_id: str,
+    connection_name: Optional[str] = None,
+    channel_id: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -162,18 +212,26 @@ def build_user_token_sign_out_request(
     # Construct parameters
     _params["userId"] = _SERIALIZER.query("user_id", user_id, "str")
     if connection_name is not None:
-        _params["connectionName"] = _SERIALIZER.query("connection_name", connection_name, "str")
+        _params["connectionName"] = _SERIALIZER.query(
+            "connection_name", connection_name, "str"
+        )
     if channel_id is not None:
         _params["channelId"] = _SERIALIZER.query("channel_id", channel_id, "str")
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
-    return HttpRequest(method="DELETE", url=_url, params=_params, headers=_headers, **kwargs)
+    return HttpRequest(
+        method="DELETE", url=_url, params=_params, headers=_headers, **kwargs
+    )
 
 
 def build_user_token_get_token_status_request(  # pylint: disable=name-too-long
-    *, user_id: str, channel_id: Optional[str] = None, include: Optional[str] = None, **kwargs: Any
+    *,
+    user_id: str,
+    channel_id: Optional[str] = None,
+    include: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -193,7 +251,9 @@ def build_user_token_get_token_status_request(  # pylint: disable=name-too-long
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
-    return HttpRequest(method="GET", url=_url, params=_params, headers=_headers, **kwargs)
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
 
 
 def build_user_token_exchange_token_request(
@@ -202,7 +262,9 @@ def build_user_token_exchange_token_request(
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -210,21 +272,31 @@ def build_user_token_exchange_token_request(
 
     # Construct parameters
     _params["userId"] = _SERIALIZER.query("user_id", user_id, "str")
-    _params["connectionName"] = _SERIALIZER.query("connection_name", connection_name, "str")
+    _params["connectionName"] = _SERIALIZER.query(
+        "connection_name", connection_name, "str"
+    )
     _params["channelId"] = _SERIALIZER.query("channel_id", channel_id, "str")
 
     # Construct headers
     if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
-    return HttpRequest(method="POST", url=_url, params=_params, headers=_headers, **kwargs)
+    return HttpRequest(
+        method="POST", url=_url, params=_params, headers=_headers, **kwargs
+    )
 
 
-def build_token_internals_post_token_status_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
+def build_token_internals_post_token_status_request(
+    **kwargs: Any,
+) -> HttpRequest:  # pylint: disable=name-too-long
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -232,7 +304,9 @@ def build_token_internals_post_token_status_request(**kwargs: Any) -> HttpReques
 
     # Construct headers
     if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
@@ -243,7 +317,9 @@ def build_token_internals_post_token_exchange_resource_request(  # pylint: disab
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -251,16 +327,22 @@ def build_token_internals_post_token_exchange_resource_request(  # pylint: disab
 
     # Construct headers
     if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
-def build_token_internals_post_token_response_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
+def build_token_internals_post_token_response_request(
+    **kwargs: Any,
+) -> HttpRequest:  # pylint: disable=name-too-long
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -268,7 +350,9 @@ def build_token_internals_post_token_response_request(**kwargs: Any) -> HttpRequ
 
     # Construct headers
     if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
@@ -279,7 +363,9 @@ def build_token_internals_post_sign_in_url_response_request(  # pylint: disable=
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -287,16 +373,22 @@ def build_token_internals_post_sign_in_url_response_request(  # pylint: disable=
 
     # Construct headers
     if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
-def build_token_internals_post_error_response_request(**kwargs: Any) -> HttpRequest:  # pylint: disable=name-too-long
+def build_token_internals_post_error_response_request(
+    **kwargs: Any,
+) -> HttpRequest:  # pylint: disable=name-too-long
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
-    content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -304,7 +396,9 @@ def build_token_internals_post_error_response_request(**kwargs: Any) -> HttpRequ
 
     # Construct headers
     if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
@@ -325,7 +419,9 @@ class BotSignInOperations:
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
 
     @distributed_trace
     def get_sign_in_url(
@@ -375,14 +471,18 @@ class BotSignInOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -456,14 +556,18 @@ class BotSignInOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -492,7 +596,9 @@ class UserTokenOperations:
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
 
     @distributed_trace
     def get_token(
@@ -553,14 +659,18 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 404]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -719,7 +829,9 @@ class UserTokenOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[Dict[str, JSON]] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -746,14 +858,18 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -768,7 +884,12 @@ class UserTokenOperations:
 
     @distributed_trace
     def sign_out(
-        self, *, user_id: str, connection_name: Optional[str] = None, channel_id: Optional[str] = None, **kwargs: Any
+        self,
+        *,
+        user_id: str,
+        connection_name: Optional[str] = None,
+        channel_id: Optional[str] = None,
+        **kwargs: Any,
     ) -> Optional[JSON]:
         """sign_out.
 
@@ -805,14 +926,18 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 204]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         deserialized = None
@@ -829,7 +954,12 @@ class UserTokenOperations:
 
     @distributed_trace
     def get_token_status(
-        self, *, user_id: str, channel_id: Optional[str] = None, include: Optional[str] = None, **kwargs: Any
+        self,
+        *,
+        user_id: str,
+        channel_id: Optional[str] = None,
+        include: Optional[str] = None,
+        **kwargs: Any,
     ) -> List[JSON]:
         """get_token_status.
 
@@ -879,14 +1009,18 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -1037,7 +1171,9 @@ class UserTokenOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -1064,14 +1200,18 @@ class UserTokenOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in [200, 404]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if response.content:
@@ -1100,11 +1240,17 @@ class TokenInternalsOperations:
         self._client = input_args.pop(0) if input_args else kwargs.pop("client")
         self._config = input_args.pop(0) if input_args else kwargs.pop("config")
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
 
     @overload
     def post_token_status(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostTokenStatus.
 
@@ -1133,7 +1279,11 @@ class TokenInternalsOperations:
 
     @overload
     def post_token_status(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostTokenStatus.
 
@@ -1185,7 +1335,9 @@ class TokenInternalsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -1209,14 +1361,18 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -1224,7 +1380,11 @@ class TokenInternalsOperations:
 
     @overload
     def post_token_exchange_resource(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostTokenExchangeResource.
 
@@ -1252,7 +1412,11 @@ class TokenInternalsOperations:
 
     @overload
     def post_token_exchange_resource(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostTokenExchangeResource.
 
@@ -1304,7 +1468,9 @@ class TokenInternalsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -1328,14 +1494,18 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -1343,7 +1513,11 @@ class TokenInternalsOperations:
 
     @overload
     def post_token_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostTokenResponse.
 
@@ -1372,7 +1546,11 @@ class TokenInternalsOperations:
 
     @overload
     def post_token_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostTokenResponse.
 
@@ -1424,7 +1602,9 @@ class TokenInternalsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -1448,14 +1628,18 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -1463,7 +1647,11 @@ class TokenInternalsOperations:
 
     @overload
     def post_sign_in_url_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostSignInUrlResponse.
 
@@ -1494,7 +1682,11 @@ class TokenInternalsOperations:
 
     @overload
     def post_sign_in_url_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostSignInUrlResponse.
 
@@ -1549,7 +1741,9 @@ class TokenInternalsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -1573,14 +1767,18 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
@@ -1588,7 +1786,11 @@ class TokenInternalsOperations:
 
     @overload
     def post_error_response(
-        self, body: Optional[JSON] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostErrorResponse.
 
@@ -1621,7 +1823,11 @@ class TokenInternalsOperations:
 
     @overload
     def post_error_response(
-        self, body: Optional[IO[bytes]] = None, *, content_type: str = "application/json", **kwargs: Any
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
     ) -> None:
         """PostErrorResponse.
 
@@ -1677,7 +1883,9 @@ class TokenInternalsOperations:
         _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
         cls: ClsType[None] = kwargs.pop("cls", None)
 
         content_type = content_type or "application/json"
@@ -1701,14 +1909,18 @@ class TokenInternalsOperations:
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
-        pipeline_response: PipelineResponse = self._client._pipeline.run(  # pylint: disable=protected-access
-            _request, stream=_stream, **kwargs
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
         )
 
         response = pipeline_response.http_response
 
         if response.status_code not in []:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
+            map_error(
+                status_code=response.status_code, response=response, error_map=error_map
+            )
             raise HttpResponseError(response=response)
 
         if cls:
