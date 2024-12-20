@@ -1,0 +1,39 @@
+pr:
+- main
+- dev
+
+pool:
+  vmImage: ubuntu-latest
+
+strategy:
+  matrix:
+    Python_3.9:
+      PYTHON_VERSION: '3.9'
+    Python_3.10:
+      PYTHON_VERSION: '3.10'
+    Python_3.11:
+      PYTHON_VERSION: '3.11'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(PYTHON_VERSION)'
+    addToPath: true
+
+- script: |
+    python -m pip install --upgrade pip
+    python -m pip install flake8 pytest black
+    if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+  displayName: 'Install dependencies'
+
+- script: |
+    black libraries --check
+  displayName: 'Check format with black'
+
+- script: |
+    flake8 . --count --exit-zero --show-source --statistics
+  displayName: 'Lint with flake8'
+
+- script: |
+    pytest
+  displayName: 'Test with pytest'
