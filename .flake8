@@ -1,0 +1,14 @@
+[flake8]
+max-line-length = 127
+max-complexity = 10
+per-file-ignores =
+    libraries/Core/Protocols/microsoft-agents-protocols/microsoft/agents/protocols/connector/*: C901, E722
+exclude =
+    migrations
+    __pycache__
+    manage.py
+    settings.py
+    env
+    .env
+    venv
+    .venv

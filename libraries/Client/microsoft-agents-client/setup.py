@@ -5,12 +5,10 @@ setup(
     version="0.0.0a1",
     packages=find_namespace_packages(),
     install_requires=[
-        "microsoft-agents-protocol",
+        "microsoft-agents-protocols",
     ],
     author="Microsoft Corporation",
     description="A client library for Microsoft Agents",
-    long_description=open("README.md").read(),
-    long_description_content_type="text/markdown",
     url="https://github.com/yourusername/microsoft-agents-client",
     classifiers=[
         "Programming Language :: Python :: 3",
