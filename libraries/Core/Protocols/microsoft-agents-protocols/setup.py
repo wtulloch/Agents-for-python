@@ -7,6 +7,7 @@ setup(
     install_requires=[
         "azure-core>=1.30.0",
         "isodate>=0.6.1",
+        "pydantic>=2.10.4"
     ],
     author="Microsoft Corporation",
     description="A protocol library for Microsoft Agents",
