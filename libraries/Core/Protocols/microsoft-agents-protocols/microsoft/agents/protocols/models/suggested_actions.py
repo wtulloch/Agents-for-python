@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from .card_action import CardAction
+from ._type_aliases import NonEmptyString
 
 
 class SuggestedActions(BaseModel):
@@ -13,5 +15,5 @@ class SuggestedActions(BaseModel):
     :type actions: list[~microsoft.agents.protocols.models.CardAction]
     """
 
-    to: list[str] = Field(None, alias="to")
-    actions: list[CardAction] = Field(None, alias="actions")
+    to: Optional[list[NonEmptyString]] = Field(None, alias="to")
+    actions: Optional[list[CardAction]] = Field(None, alias="actions")

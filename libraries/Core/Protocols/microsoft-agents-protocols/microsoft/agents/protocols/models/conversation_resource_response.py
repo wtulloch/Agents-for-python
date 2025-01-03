@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class ConversationResourceResponse(BaseModel):
@@ -13,6 +15,6 @@ class ConversationResourceResponse(BaseModel):
     :type id: str
     """
 
-    activity_id: str = Field(None, alias="activityId")
-    service_url: str = Field(None, alias="serviceUrl")
-    id: str = Field(None, alias="id")
+    activity_id: Optional[NonEmptyString] = Field(None, alias="activityId")
+    service_url: Optional[NonEmptyString] = Field(None, alias="serviceUrl")
+    id: Optional[NonEmptyString] = Field(None, alias="id")

@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 
 from pydantic import BaseModel, Field
+from ._type_aliases import NonEmptyString
+from typing import Optional
 
 
 class TokenResponse(BaseModel):
@@ -18,7 +20,7 @@ class TokenResponse(BaseModel):
     :type channel_id: str
     """
 
-    connection_name: str = Field(None, alias="connectionName")
-    token: str = Field(None, alias="token")
-    expiration: str = Field(None, alias="expiration")
-    channel_id: str = Field(None, alias="channelId")
+    connection_name: Optional[NonEmptyString] = Field(None, alias="connectionName")
+    token: Optional[NonEmptyString] = Field(None, alias="token")
+    expiration: Optional[NonEmptyString] = Field(None, alias="expiration")
+    channel_id: Optional[NonEmptyString] = Field(None, alias="channelId")

@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class MediaUrl(BaseModel):
@@ -11,5 +13,5 @@ class MediaUrl(BaseModel):
     :type profile: str
     """
 
-    url: str = Field(None, alias="url")
-    profile: str = Field(None, alias="profile")
+    url: Optional[NonEmptyString] = Field(None, alias="url")
+    profile: Optional[NonEmptyString] = Field(None, alias="profile")

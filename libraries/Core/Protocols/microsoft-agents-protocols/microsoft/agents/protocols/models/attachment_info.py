@@ -1,5 +1,7 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 from .attachment_view import AttachmentView
+from ._type_aliases import NonEmptyString
 
 
 class AttachmentInfo(BaseModel):
@@ -13,6 +15,6 @@ class AttachmentInfo(BaseModel):
     :type views: list[~microsoft.agents.protocols.models.AttachmentView]
     """
 
-    name: str = Field(None, alias="name")
-    type: str = Field(None, alias="type")
-    views: list[AttachmentView] = Field(None, alias="views")
+    name: Optional[NonEmptyString] = Field(None, alias="name")
+    type: Optional[NonEmptyString] = Field(None, alias="type")
+    views: Optional[list[AttachmentView]] = Field(None, alias="views")

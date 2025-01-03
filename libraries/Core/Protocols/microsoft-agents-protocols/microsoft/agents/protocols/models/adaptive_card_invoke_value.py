@@ -1,6 +1,8 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 from .adaptive_card_invoke_action import AdaptiveCardInvokeAction
 from .token_exchange_invoke_request import TokenExchangeInvokeRequest
+from ._type_aliases import NonEmptyString
 
 
 class AdaptiveCardInvokeValue(BaseModel):
@@ -16,6 +18,8 @@ class AdaptiveCardInvokeValue(BaseModel):
     :type state: str
     """
 
-    action: AdaptiveCardInvokeAction = Field(None, alias="action")
-    authentication: TokenExchangeInvokeRequest = Field(None, alias="authentication")
-    state: str = Field(None, alias="state")
+    action: Optional[AdaptiveCardInvokeAction] = Field(None, alias="action")
+    authentication: Optional[TokenExchangeInvokeRequest] = Field(
+        None, alias="authentication"
+    )
+    state: Optional[NonEmptyString] = Field(None, alias="state")

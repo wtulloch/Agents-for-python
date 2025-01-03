@@ -1,4 +1,6 @@
+from typing import Optional
 from pydantic import BaseModel, Field
+from ._type_aliases import NonEmptyString
 
 
 class AttachmentView(BaseModel):
@@ -10,5 +12,5 @@ class AttachmentView(BaseModel):
     :type size: int
     """
 
-    view_id: str = Field(None, alias="viewId")
-    size: int = Field(None, alias="size")
+    view_id: Optional[NonEmptyString] = Field(None, alias="viewId")
+    size: Optional[int] = Field(None, alias="size")

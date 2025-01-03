@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class Place(BaseModel):
@@ -19,8 +21,8 @@ class Place(BaseModel):
     :type name: str
     """
 
-    address: object = Field(None, alias="address")
-    geo: object = Field(None, alias="geo")
-    has_map: object = Field(None, alias="hasMap")
-    type: str = Field(None, alias="type")
-    name: str = Field(None, alias="name")
+    address: Optional[object] = Field(None, alias="address")
+    geo: Optional[object] = Field(None, alias="geo")
+    has_map: Optional[object] = Field(None, alias="hasMap")
+    type: Optional[NonEmptyString] = Field(None, alias="type")
+    name: Optional[NonEmptyString] = Field(None, alias="name")

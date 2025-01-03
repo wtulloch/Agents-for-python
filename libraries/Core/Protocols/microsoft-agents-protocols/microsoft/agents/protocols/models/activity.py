@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Optional
 from pydantic import BaseModel, Field
 from .activity_types import ActivityTypes
 from .channel_account import ChannelAccount
@@ -12,6 +13,7 @@ from .entity import Entity
 from .conversation_reference import ConversationReference
 from .text_highlight import TextHighlight
 from .semantic_action import SemanticAction
+from ._type_aliases import NonEmptyString
 
 
 class Activity(BaseModel):
@@ -152,48 +154,56 @@ class Activity(BaseModel):
     :type caller_id: str
     """
 
-    type: str = Field(None, alias="type")
-    id: str = Field(None, alias="id")
-    timestamp: datetime = Field(None, alias="timestamp")
-    local_timestamp: datetime = Field(None, alias="localTimestamp")
-    local_timezone: str = Field(None, alias="localTimezone")
-    service_url: str = Field(None, alias="serviceUrl")
-    channel_id: str = Field(None, alias="channelId")
-    from_property: ChannelAccount = Field(None, alias="from")
-    conversation: ConversationAccount = Field(None, alias="conversation")
-    recipient: ChannelAccount = Field(None, alias="recipient")
-    text_format: str = Field(None, alias="textFormat")
-    attachment_layout: str = Field(None, alias="attachmentLayout")
-    members_added: list[ChannelAccount] = Field(None, alias="membersAdded")
-    members_removed: list[ChannelAccount] = Field(None, alias="membersRemoved")
-    reactions_added: list[MessageReaction] = Field(None, alias="reactionsAdded")
-    reactions_removed: list[MessageReaction] = Field(None, alias="reactionsRemoved")
-    topic_name: str = Field(None, alias="topicName")
-    history_disclosed: bool = Field(None, alias="historyDisclosed")
-    locale: str = Field(None, alias="locale")
-    text: str = Field(None, alias="text")
-    speak: str = Field(None, alias="speak")
-    input_hint: str = Field(None, alias="inputHint")
-    summary: str = Field(None, alias="summary")
-    suggested_actions: SuggestedActions = Field(None, alias="suggestedActions")
-    attachments: list[Attachment] = Field(None, alias="attachments")
-    entities: list[Entity] = Field(None, alias="entities")
-    channel_data: object = Field(None, alias="channelData")
-    action: str = Field(None, alias="action")
-    reply_to_id: str = Field(None, alias="replyToId")
-    label: str = Field(None, alias="label")
-    value_type: str = Field(None, alias="valueType")
-    value: object = Field(None, alias="value")
-    name: str = Field(None, alias="name")
-    relates_to: ConversationReference = Field(None, alias="relatesTo")
-    code: str = Field(None, alias="code")
-    expiration: datetime = Field(None, alias="expiration")
-    importance: str = Field(None, alias="importance")
-    delivery_mode: str = Field(None, alias="deliveryMode")
-    listen_for: list[str] = Field(None, alias="listenFor")
-    text_highlights: list[TextHighlight] = Field(None, alias="textHighlights")
-    semantic_action: SemanticAction = Field(None, alias="semanticAction")
-    caller_id: str = Field(None, alias="callerId")
+    type: NonEmptyString = Field(None, alias="type")
+    id: Optional[NonEmptyString] = Field(None, alias="id")
+    timestamp: Optional[datetime] = Field(None, alias="timestamp")
+    local_timestamp: Optional[datetime] = Field(None, alias="localTimestamp")
+    local_timezone: Optional[NonEmptyString] = Field(None, alias="localTimezone")
+    service_url: Optional[NonEmptyString] = Field(None, alias="serviceUrl")
+    channel_id: Optional[NonEmptyString] = Field(None, alias="channelId")
+    from_property: Optional[ChannelAccount] = Field(None, alias="from")
+    conversation: Optional[ConversationAccount] = Field(None, alias="conversation")
+    recipient: Optional[ChannelAccount] = Field(None, alias="recipient")
+    text_format: Optional[NonEmptyString] = Field(None, alias="textFormat")
+    attachment_layout: Optional[NonEmptyString] = Field(None, alias="attachmentLayout")
+    members_added: Optional[list[ChannelAccount]] = Field(None, alias="membersAdded")
+    members_removed: Optional[list[ChannelAccount]] = Field(
+        None, alias="membersRemoved"
+    )
+    reactions_added: Optional[list[MessageReaction]] = Field(
+        None, alias="reactionsAdded"
+    )
+    reactions_removed: Optional[list[MessageReaction]] = Field(
+        None, alias="reactionsRemoved"
+    )
+    topic_name: Optional[NonEmptyString] = Field(None, alias="topicName")
+    history_disclosed: Optional[bool] = Field(None, alias="historyDisclosed")
+    locale: Optional[NonEmptyString] = Field(None, alias="locale")
+    text: Optional[NonEmptyString] = Field(None, alias="text")
+    speak: Optional[NonEmptyString] = Field(None, alias="speak")
+    input_hint: Optional[NonEmptyString] = Field(None, alias="inputHint")
+    summary: Optional[NonEmptyString] = Field(None, alias="summary")
+    suggested_actions: Optional[SuggestedActions] = Field(
+        None, alias="suggestedActions"
+    )
+    attachments: Optional[list[Attachment]] = Field(None, alias="attachments")
+    entities: Optional[list[Entity]] = Field(None, alias="entities")
+    channel_data: Optional[object] = Field(None, alias="channelData")
+    action: Optional[NonEmptyString] = Field(None, alias="action")
+    reply_to_id: Optional[NonEmptyString] = Field(None, alias="replyToId")
+    label: Optional[NonEmptyString] = Field(None, alias="label")
+    value_type: Optional[NonEmptyString] = Field(None, alias="valueType")
+    value: Optional[object] = Field(None, alias="value")
+    name: Optional[NonEmptyString] = Field(None, alias="name")
+    relates_to: Optional[ConversationReference] = Field(None, alias="relatesTo")
+    code: Optional[NonEmptyString] = Field(None, alias="code")
+    expiration: Optional[datetime] = Field(None, alias="expiration")
+    importance: Optional[NonEmptyString] = Field(None, alias="importance")
+    delivery_mode: Optional[NonEmptyString] = Field(None, alias="deliveryMode")
+    listen_for: Optional[list[NonEmptyString]] = Field(None, alias="listenFor")
+    text_highlights: Optional[list[TextHighlight]] = Field(None, alias="textHighlights")
+    semantic_action: Optional[SemanticAction] = Field(None, alias="semanticAction")
+    caller_id: Optional[NonEmptyString] = Field(None, alias="callerId")
 
     def apply_conversation_reference(
         self, reference: ConversationReference, is_incoming: bool = False

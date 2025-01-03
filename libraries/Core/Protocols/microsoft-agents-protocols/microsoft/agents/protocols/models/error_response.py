@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from .error import Error
 
 
@@ -9,4 +10,4 @@ class ErrorResponse(BaseModel):
     :type error: ~microsoft.agents.protocols.models.Error
     """
 
-    error: Error = Field(None, alias="error")
+    error: Optional[Error] = Field(None, alias="error")

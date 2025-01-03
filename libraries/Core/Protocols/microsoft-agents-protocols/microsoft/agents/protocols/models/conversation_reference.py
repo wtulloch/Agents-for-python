@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from .channel_account import ChannelAccount
 from .conversation_account import ConversationAccount
+from ._type_aliases import NonEmptyString
 
 
 class ConversationReference(BaseModel):
@@ -27,10 +29,10 @@ class ConversationReference(BaseModel):
     :type service_url: str
     """
 
-    activity_id: str = Field(None, alias="activityId")
-    user: ChannelAccount = Field(None, alias="user")
-    bot: ChannelAccount = Field(None, alias="bot")
-    conversation: ConversationAccount = Field(None, alias="conversation")
-    channel_id: str = Field(None, alias="channelId")
-    locale: str = Field(None, alias="locale")
-    service_url: str = Field(None, alias="serviceUrl")
+    activity_id: Optional[NonEmptyString] = Field(None, alias="activityId")
+    user: Optional[ChannelAccount] = Field(None, alias="user")
+    bot: Optional[ChannelAccount] = Field(None, alias="bot")
+    conversation: Optional[ConversationAccount] = Field(None, alias="conversation")
+    channel_id: Optional[NonEmptyString] = Field(None, alias="channelId")
+    locale: Optional[NonEmptyString] = Field(None, alias="locale")
+    service_url: Optional[NonEmptyString] = Field(None, alias="serviceUrl")

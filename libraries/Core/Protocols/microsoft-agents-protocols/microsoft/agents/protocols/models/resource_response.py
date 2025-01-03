@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class ResourceResponse(BaseModel):
@@ -8,4 +10,4 @@ class ResourceResponse(BaseModel):
     :type id: str
     """
 
-    id: str = Field(None, alias="id")
+    id: Optional[NonEmptyString] = Field(None, alias="id")

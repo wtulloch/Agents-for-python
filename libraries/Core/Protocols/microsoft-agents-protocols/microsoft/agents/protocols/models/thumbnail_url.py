@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class ThumbnailUrl(BaseModel):
@@ -10,5 +12,5 @@ class ThumbnailUrl(BaseModel):
     :type alt: str
     """
 
-    url: str = Field(None, alias="url")
-    alt: str = Field(None, alias="alt")
+    url: Optional[NonEmptyString] = Field(None, alias="url")
+    alt: Optional[NonEmptyString] = Field(None, alias="alt")

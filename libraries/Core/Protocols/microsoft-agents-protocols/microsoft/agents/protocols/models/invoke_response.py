@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class InvokeResponse(BaseModel):
@@ -12,8 +13,8 @@ class InvokeResponse(BaseModel):
     the content is and deserialize as needed.
     """
 
-    status: int = Field(None, alias="status")
-    body: object = Field(None, alias="body")
+    status: Optional[int] = Field(None, alias="status")
+    body: Optional[object] = Field(None, alias="body")
 
     def is_successful_status_code(self) -> bool:
         """

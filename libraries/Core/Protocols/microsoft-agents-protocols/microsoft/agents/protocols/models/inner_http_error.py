@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class InnerHttpError(BaseModel):
@@ -10,5 +11,5 @@ class InnerHttpError(BaseModel):
     :type body: object
     """
 
-    status_code: int = Field(None, alias="statusCode")
-    body: object = Field(None, alias="body")
+    status_code: Optional[int] = Field(None, alias="statusCode")
+    body: Optional[object] = Field(None, alias="body")

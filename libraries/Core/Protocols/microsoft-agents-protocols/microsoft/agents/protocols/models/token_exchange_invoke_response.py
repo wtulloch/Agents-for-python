@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from ._type_aliases import NonEmptyString
+from typing import Optional
 
 
 class TokenExchangeInvokeResponse(BaseModel):
@@ -14,7 +16,7 @@ class TokenExchangeInvokeResponse(BaseModel):
     :type properties: dict[str, object]
     """
 
-    id: str = Field(None, alias="id")
-    connection_name: str = Field(None, alias="connectionName")
-    failure_detail: str = Field(None, alias="failureDetail")
-    properties: dict = Field(None, alias="properties")
+    id: Optional[NonEmptyString] = Field(None, alias="id")
+    connection_name: Optional[NonEmptyString] = Field(None, alias="connectionName")
+    failure_detail: Optional[NonEmptyString] = Field(None, alias="failureDetail")
+    properties: Optional[dict] = Field(None, alias="properties")

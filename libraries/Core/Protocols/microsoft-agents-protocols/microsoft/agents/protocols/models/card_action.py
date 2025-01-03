@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class CardAction(BaseModel):
@@ -27,11 +29,11 @@ class CardAction(BaseModel):
     :type image_alt_text: str
     """
 
-    type: str = Field(None, alias="type")
-    title: str = Field(None, alias="title")
-    image: str = Field(None, alias="image")
-    text: str = Field(None, alias="text")
-    display_text: str = Field(None, alias="displayText")
-    value: object = Field(None, alias="value")
-    channel_data: object = Field(None, alias="channelData")
-    image_alt_text: str = Field(None, alias="imageAltText")
+    type: Optional[NonEmptyString] = Field(None, alias="type")
+    title: Optional[NonEmptyString] = Field(None, alias="title")
+    image: Optional[NonEmptyString] = Field(None, alias="image")
+    text: Optional[NonEmptyString] = Field(None, alias="text")
+    display_text: Optional[NonEmptyString] = Field(None, alias="displayText")
+    value: Optional[object] = Field(None, alias="value")
+    channel_data: Optional[object] = Field(None, alias="channelData")
+    image_alt_text: Optional[NonEmptyString] = Field(None, alias="imageAltText")

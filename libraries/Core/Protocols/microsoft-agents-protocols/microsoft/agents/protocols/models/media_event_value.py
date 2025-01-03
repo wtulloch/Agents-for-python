@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class MediaEventValue(BaseModel):
@@ -9,4 +10,4 @@ class MediaEventValue(BaseModel):
     :type card_value: object
     """
 
-    card_value: object = Field(None, alias="cardValue")
+    card_value: Optional[object] = Field(None, alias="cardValue")

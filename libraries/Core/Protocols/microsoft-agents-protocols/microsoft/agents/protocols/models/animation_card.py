@@ -1,7 +1,9 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 from .thumbnail_url import ThumbnailUrl
 from .media_url import MediaUrl
 from .card_action import CardAction
+from ._type_aliases import NonEmptyString
 
 
 class AnimationCard(BaseModel):
@@ -39,15 +41,15 @@ class AnimationCard(BaseModel):
     :type value: object
     """
 
-    title: str = Field(None, alias="title")
-    subtitle: str = Field(None, alias="subtitle")
-    text: str = Field(None, alias="text")
-    image: ThumbnailUrl = Field(None, alias="image")
-    media: list[MediaUrl] = Field(None, alias="media")
-    buttons: list[CardAction] = Field(None, alias="buttons")
-    shareable: bool = Field(None, alias="shareable")
-    autoloop: bool = Field(None, alias="autoloop")
-    autostart: bool = Field(None, alias="autostart")
-    aspect: str = Field(None, alias="aspect")
-    duration: str = Field(None, alias="duration")
-    value: object = Field(None, alias="value")
+    title: Optional[NonEmptyString] = Field(None, alias="title")
+    subtitle: Optional[NonEmptyString] = Field(None, alias="subtitle")
+    text: Optional[NonEmptyString] = Field(None, alias="text")
+    image: Optional[ThumbnailUrl] = Field(None, alias="image")
+    media: Optional[list[MediaUrl]] = Field(None, alias="media")
+    buttons: Optional[list[CardAction]] = Field(None, alias="buttons")
+    shareable: Optional[bool] = Field(None, alias="shareable")
+    autoloop: Optional[bool] = Field(None, alias="autoloop")
+    autostart: Optional[bool] = Field(None, alias="autostart")
+    aspect: Optional[NonEmptyString] = Field(None, alias="aspect")
+    duration: Optional[NonEmptyString] = Field(None, alias="duration")
+    value: Optional[object] = Field(None, alias="value")

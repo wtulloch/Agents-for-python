@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from ._type_aliases import NonEmptyString
+from typing import Optional
 
 
 class SemanticAction(BaseModel):
@@ -12,6 +14,6 @@ class SemanticAction(BaseModel):
     :type state: str or ~microsoft.agents.protocols.models.SemanticActionStates
     """
 
-    id: str = Field(None, alias="id")
-    entities: dict = Field(None, alias="entities")
-    state: str = Field(None, alias="state")
+    id: Optional[NonEmptyString] = Field(None, alias="id")
+    entities: Optional[dict] = Field(None, alias="entities")
+    state: Optional[NonEmptyString] = Field(None, alias="state")

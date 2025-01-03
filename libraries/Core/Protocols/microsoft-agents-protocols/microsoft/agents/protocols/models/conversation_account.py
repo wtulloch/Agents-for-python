@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class ConversationAccount(BaseModel):
@@ -27,11 +29,11 @@ class ConversationAccount(BaseModel):
     :type properties: object
     """
 
-    is_group: bool = Field(None, alias="isGroup")
-    conversation_type: str = Field(None, alias="conversationType")
-    id: str = Field(None, alias="id")
-    name: str = Field(None, alias="name")
-    aad_object_id: str = Field(None, alias="aadObjectId")
-    role: str = Field(None, alias="role")
-    tenant_id: str = Field(None, alias="tenantID")
-    properties: object = Field(None, alias="properties")
+    is_group: Optional[bool] = Field(None, alias="isGroup")
+    conversation_type: Optional[NonEmptyString] = Field(None, alias="conversationType")
+    id: Optional[NonEmptyString] = Field(None, alias="id")
+    name: Optional[NonEmptyString] = Field(None, alias="name")
+    aad_object_id: Optional[NonEmptyString] = Field(None, alias="aadObjectId")
+    role: Optional[NonEmptyString] = Field(None, alias="role")
+    tenant_id: Optional[NonEmptyString] = Field(None, alias="tenantID")
+    properties: Optional[object] = Field(None, alias="properties")

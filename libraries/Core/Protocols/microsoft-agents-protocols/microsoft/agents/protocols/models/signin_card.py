@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from .card_action import CardAction
+from ._type_aliases import NonEmptyString
 
 
 class SigninCard(BaseModel):
@@ -11,5 +13,5 @@ class SigninCard(BaseModel):
     :type buttons: list[~microsoft.agents.protocols.models.CardAction]
     """
 
-    text: str = Field(None, alias="text")
-    buttons: list[CardAction] = Field(None, alias="buttons")
+    text: Optional[NonEmptyString] = Field(None, alias="text")
+    buttons: Optional[list[CardAction]] = Field(None, alias="buttons")

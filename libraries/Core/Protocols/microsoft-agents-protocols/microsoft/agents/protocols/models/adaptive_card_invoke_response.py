@@ -1,4 +1,6 @@
+from typing import Optional
 from pydantic import BaseModel, Field
+from ._type_aliases import NonEmptyString
 
 
 class AdaptiveCardInvokeResponse(BaseModel):
@@ -14,6 +16,6 @@ class AdaptiveCardInvokeResponse(BaseModel):
     :type value: dict[str, object]
     """
 
-    status_code: int = Field(None, alias="statusCode")
-    type: str = Field(None, alias="type")
-    value: dict = Field(None, alias="value")
+    status_code: Optional[int] = Field(None, alias="statusCode")
+    type: Optional[NonEmptyString] = Field(None, alias="type")
+    value: Optional[dict[NonEmptyString, object]] = Field(None, alias="value")

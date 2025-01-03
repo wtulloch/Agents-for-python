@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class TokenRequest(BaseModel):
@@ -11,5 +13,5 @@ class TokenRequest(BaseModel):
     :type settings: dict[str, object]
     """
 
-    provider: str = Field(None, alias="provider")
-    settings: dict = Field(None, alias="settings")
+    provider: Optional[NonEmptyString] = Field(None, alias="provider")
+    settings: Optional[dict] = Field(None, alias="settings")

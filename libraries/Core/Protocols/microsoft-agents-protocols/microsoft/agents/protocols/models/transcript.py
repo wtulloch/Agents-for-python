@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from .activity import Activity
 
 
@@ -10,4 +11,4 @@ class Transcript(BaseModel):
     :type activities: list[~microsoft.agents.protocols.models.Activity]
     """
 
-    activities: list[Activity] = Field(None, alias="activities")
+    activities: Optional[list[Activity]] = Field(None, alias="activities")

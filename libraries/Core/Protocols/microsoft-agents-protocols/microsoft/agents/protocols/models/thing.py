@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class Thing(BaseModel):
@@ -10,5 +12,5 @@ class Thing(BaseModel):
     :type name: str
     """
 
-    type: str = Field(None, alias="type")
-    name: str = Field(None, alias="name")
+    type: Optional[NonEmptyString] = Field(None, alias="type")
+    name: Optional[NonEmptyString] = Field(None, alias="name")

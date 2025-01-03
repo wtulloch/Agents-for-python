@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 from .channel_account import ChannelAccount
+from ._type_aliases import NonEmptyString
+from typing import Optional
 
 
 class Mention(BaseModel):
@@ -13,6 +15,6 @@ class Mention(BaseModel):
     :type type: str
     """
 
-    mentioned: ChannelAccount = Field(None, alias="mentioned")
-    text: str = Field(None, alias="text")
-    type: str = Field(None, alias="type")
+    mentioned: Optional[ChannelAccount] = Field(None, alias="mentioned")
+    text: Optional[NonEmptyString] = Field(None, alias="text")
+    type: Optional[NonEmptyString] = Field(None, alias="type")

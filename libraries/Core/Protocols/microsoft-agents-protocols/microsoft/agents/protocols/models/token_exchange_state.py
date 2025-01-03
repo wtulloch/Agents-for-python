@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from .conversation_reference import ConversationReference
+from ._type_aliases import NonEmptyString
 
 
 class TokenExchangeState(BaseModel):
@@ -17,8 +19,8 @@ class TokenExchangeState(BaseModel):
     :type ms_app_id: str
     """
 
-    connection_name: str = Field(None, alias="connectionName")
-    conversation: ConversationReference = Field(None, alias="conversation")
-    relates_to: ConversationReference = Field(None, alias="relatesTo")
-    bot_url: str = Field(None, alias="botUrl")
-    ms_app_id: str = Field(None, alias="msAppId")
+    connection_name: Optional[NonEmptyString] = Field(None, alias="connectionName")
+    conversation: Optional[ConversationReference] = Field(None, alias="conversation")
+    relates_to: Optional[ConversationReference] = Field(None, alias="relatesTo")
+    bot_url: Optional[NonEmptyString] = Field(None, alias="botUrl")
+    ms_app_id: Optional[NonEmptyString] = Field(None, alias="msAppId")

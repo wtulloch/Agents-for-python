@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class ChannelAccount(BaseModel):
@@ -17,8 +19,8 @@ class ChannelAccount(BaseModel):
     :type role: str or ~microsoft.agents.protocols.models.RoleTypes
     """
 
-    id: str = Field(None, alias="id")
-    name: str = Field(None, alias="name")
-    aad_object_id: str = Field(None, alias="aadObjectId")
-    role: str = Field(None, alias="role")
-    properties: object = Field(None, alias="properties")
+    id: Optional[NonEmptyString] = Field(None, alias="id")
+    name: Optional[NonEmptyString] = Field(None, alias="name")
+    aad_object_id: Optional[NonEmptyString] = Field(None, alias="aadObjectId")
+    role: Optional[NonEmptyString] = Field(None, alias="role")
+    properties: Optional[object] = Field(None, alias="properties")

@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class Fact(BaseModel):
@@ -13,5 +15,5 @@ class Fact(BaseModel):
     :type value: str
     """
 
-    key: str = Field(None, alias="key")
-    value: str = Field(None, alias="value")
+    key: Optional[NonEmptyString] = Field(None, alias="key")
+    value: Optional[NonEmptyString] = Field(None, alias="value")

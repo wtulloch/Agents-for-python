@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class TextHighlight(BaseModel):
@@ -11,5 +13,5 @@ class TextHighlight(BaseModel):
     :type occurrence: int
     """
 
-    text: str = Field(None, alias="text")
-    occurrence: int = Field(None, alias="occurrence")
+    text: Optional[NonEmptyString] = Field(None, alias="text")
+    occurrence: Optional[int] = Field(None, alias="occurrence")

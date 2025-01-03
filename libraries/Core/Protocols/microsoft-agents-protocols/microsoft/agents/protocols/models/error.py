@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from .inner_http_error import InnerHttpError
+from ._type_aliases import NonEmptyString
 
 
 class Error(BaseModel):
@@ -13,6 +15,6 @@ class Error(BaseModel):
     :type inner_http_error: ~microsoft.agents.protocols.models.InnerHttpError
     """
 
-    code: str = Field(None, alias="code")
-    message: str = Field(None, alias="message")
-    inner_http_error: InnerHttpError = Field(None, alias="innerHttpError")
+    code: Optional[NonEmptyString] = Field(None, alias="code")
+    message: Optional[NonEmptyString] = Field(None, alias="message")
+    inner_http_error: Optional[InnerHttpError] = Field(None, alias="innerHttpError")

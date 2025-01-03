@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from .fact import Fact
 from .receipt_item import ReceiptItem
 from .card_action import CardAction
+from ._type_aliases import NonEmptyString
+from typing import Optional
 
 
 class ReceiptCard(BaseModel):
@@ -25,11 +27,11 @@ class ReceiptCard(BaseModel):
     :type buttons: list[~microsoft.agents.protocols.models.CardAction]
     """
 
-    title: str = Field(None, alias="title")
-    facts: list[Fact] = Field(None, alias="facts")
-    items: list[ReceiptItem] = Field(None, alias="items")
-    tap: CardAction = Field(None, alias="tap")
-    total: str = Field(None, alias="total")
-    tax: str = Field(None, alias="tax")
-    vat: str = Field(None, alias="vat")
-    buttons: list[CardAction] = Field(None, alias="buttons")
+    title: Optional[NonEmptyString] = Field(None, alias="title")
+    facts: Optional[list[Fact]] = Field(None, alias="facts")
+    items: Optional[list[ReceiptItem]] = Field(None, alias="items")
+    tap: Optional[CardAction] = Field(None, alias="tap")
+    total: Optional[NonEmptyString] = Field(None, alias="total")
+    tax: Optional[NonEmptyString] = Field(None, alias="tax")
+    vat: Optional[NonEmptyString] = Field(None, alias="vat")
+    buttons: Optional[list[CardAction]] = Field(None, alias="buttons")

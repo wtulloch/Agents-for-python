@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from .card_action import CardAction
+from ._type_aliases import NonEmptyString
 
 
 class OAuthCard(BaseModel):
@@ -13,7 +15,9 @@ class OAuthCard(BaseModel):
     :type buttons: list[~microsoft.agents.protocols.models.CardAction]
     """
 
-    text: str = Field(None, alias="text")
-    connection_name: str = Field(None, alias="connectionName")
-    buttons: list[CardAction] = Field(None, alias="buttons")
-    token_exchange_resource: object = Field(None, alias="tokenExchangeResource")
+    text: Optional[NonEmptyString] = Field(None, alias="text")
+    connection_name: Optional[NonEmptyString] = Field(None, alias="connectionName")
+    buttons: Optional[list[CardAction]] = Field(None, alias="buttons")
+    token_exchange_resource: Optional[object] = Field(
+        None, alias="tokenExchangeResource"
+    )

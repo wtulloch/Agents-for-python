@@ -1,6 +1,8 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 from .card_image import CardImage
 from .card_action import CardAction
+from ._type_aliases import NonEmptyString
 
 
 class BasicCard(BaseModel):
@@ -21,9 +23,9 @@ class BasicCard(BaseModel):
     :type tap: ~microsoft.agents.protocols.models.CardAction
     """
 
-    title: str = Field(None, alias="title")
-    subtitle: str = Field(None, alias="subtitle")
-    text: str = Field(None, alias="text")
-    images: list[CardImage] = Field(None, alias="images")
-    buttons: list[CardAction] = Field(None, alias="buttons")
-    tap: CardAction = Field(None, alias="tap")
+    title: Optional[NonEmptyString] = Field(None, alias="title")
+    subtitle: Optional[NonEmptyString] = Field(None, alias="subtitle")
+    text: Optional[NonEmptyString] = Field(None, alias="text")
+    images: Optional[list[CardImage]] = Field(None, alias="images")
+    buttons: Optional[list[CardAction]] = Field(None, alias="buttons")
+    tap: Optional[CardAction] = Field(None, alias="tap")

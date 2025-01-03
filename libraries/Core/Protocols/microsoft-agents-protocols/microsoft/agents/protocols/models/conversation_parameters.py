@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 from .channel_account import ChannelAccount
 from .activity import Activity
+from ._type_aliases import NonEmptyString
 
 
 class ConversationParameters(BaseModel):
@@ -25,10 +27,10 @@ class ConversationParameters(BaseModel):
     :type tenant_id: str
     """
 
-    is_group: bool = Field(None, alias="isGroup")
-    bot: ChannelAccount = Field(None, alias="bot")
-    members: list[ChannelAccount] = Field(None, alias="members")
-    topic_name: str = Field(None, alias="topicName")
-    activity: Activity = Field(None, alias="activity")
-    channel_data: object = Field(None, alias="channelData")
-    tenant_id: str = Field(None, alias="tenantID")
+    is_group: Optional[bool] = Field(None, alias="isGroup")
+    bot: Optional[ChannelAccount] = Field(None, alias="bot")
+    members: Optional[list[ChannelAccount]] = Field(None, alias="members")
+    topic_name: Optional[NonEmptyString] = Field(None, alias="topicName")
+    activity: Optional[Activity] = Field(None, alias="activity")
+    channel_data: Optional[object] = Field(None, alias="channelData")
+    tenant_id: Optional[NonEmptyString] = Field(None, alias="tenantID")

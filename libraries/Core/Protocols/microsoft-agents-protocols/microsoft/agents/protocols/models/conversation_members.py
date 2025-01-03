@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 from .channel_account import ChannelAccount
+from typing import Optional
+from ._type_aliases import NonEmptyString
 
 
 class ConversationMembers(BaseModel):
@@ -11,5 +13,5 @@ class ConversationMembers(BaseModel):
     :type members: list[~microsoft.agents.protocols.models.ChannelAccount]
     """
 
-    id: str = Field(None, alias="id")
-    members: list[ChannelAccount] = Field(None, alias="members")
+    id: Optional[NonEmptyString] = Field(None, alias="id")
+    members: Optional[list[ChannelAccount]] = Field(None, alias="members")

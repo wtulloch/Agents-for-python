@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 from .channel_account import ChannelAccount
+from ._type_aliases import NonEmptyString
+from typing import Optional
 
 
 class PagedMembersResult(BaseModel):
@@ -11,5 +13,7 @@ class PagedMembersResult(BaseModel):
     :type members: list[~microsoft.agents.protocols.models.ChannelAccount]
     """
 
-    continuation_token: str = Field(None, alias="continuationToken")
-    members: list[ChannelAccount] = Field(None, alias="members")
+    continuation_token: Optional[NonEmptyString] = Field(
+        None, alias="continuationToken"
+    )
+    members: Optional[list[ChannelAccount]] = Field(None, alias="members")

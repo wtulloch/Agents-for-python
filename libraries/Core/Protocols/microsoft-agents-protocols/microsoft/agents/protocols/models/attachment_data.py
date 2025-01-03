@@ -1,4 +1,6 @@
+from typing import Optional
 from pydantic import BaseModel, Field
+from ._type_aliases import NonEmptyString
 
 
 class AttachmentData(BaseModel):
@@ -14,7 +16,7 @@ class AttachmentData(BaseModel):
     :type thumbnail_base64: bytearray
     """
 
-    type: str = Field(None, alias="type")
-    name: str = Field(None, alias="name")
-    original_base64: bytearray = Field(None, alias="originalBase64")
-    thumbnail_base64: bytearray = Field(None, alias="thumbnailBase64")
+    type: Optional[NonEmptyString] = Field(None, alias="type")
+    name: Optional[NonEmptyString] = Field(None, alias="name")
+    original_base64: Optional[bytearray] = Field(None, alias="originalBase64")
+    thumbnail_base64: Optional[bytearray] = Field(None, alias="thumbnailBase64")
