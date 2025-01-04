@@ -1,11 +1,10 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from .card_image import CardImage
 from .card_action import CardAction
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class ThumbnailCard(BaseModel):
+class ThumbnailCard(AgentsModel):
     """A thumbnail card (card with a single, small thumbnail image).
 
     :param title: Title of the card
@@ -23,9 +22,9 @@ class ThumbnailCard(BaseModel):
     :type tap: ~microsoft.agents.protocols.models.CardAction
     """
 
-    title: Optional[NonEmptyString] = Field(None, alias="title")
-    subtitle: Optional[NonEmptyString] = Field(None, alias="subtitle")
-    text: Optional[NonEmptyString] = Field(None, alias="text")
-    images: Optional[list[CardImage]] = Field(None, alias="images")
-    buttons: Optional[list[CardAction]] = Field(None, alias="buttons")
-    tap: Optional[CardAction] = Field(None, alias="tap")
+    title: NonEmptyString = None
+    subtitle: NonEmptyString = None
+    text: NonEmptyString = None
+    images: list[CardImage] = None
+    buttons: list[CardAction] = None
+    tap: CardAction = None

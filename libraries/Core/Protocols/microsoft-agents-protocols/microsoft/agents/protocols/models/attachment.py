@@ -1,9 +1,8 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class Attachment(BaseModel):
+class Attachment(AgentsModel):
     """An attachment within an activity.
 
     :param content_type: mimetype/Contenttype for the file
@@ -18,8 +17,8 @@ class Attachment(BaseModel):
     :type thumbnail_url: str
     """
 
-    content_type: NonEmptyString = Field(None, alias="contentType")
-    content_url: Optional[NonEmptyString] = Field(None, alias="contentUrl")
-    content: Optional[object] = Field(None, alias="content")
-    name: Optional[NonEmptyString] = Field(None, alias="name")
-    thumbnail_url: Optional[NonEmptyString] = Field(None, alias="thumbnailUrl")
+    content_type: NonEmptyString
+    content_url: NonEmptyString = None
+    content: object = None
+    name: NonEmptyString = None
+    thumbnail_url: NonEmptyString = None

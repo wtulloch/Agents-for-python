@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class ChannelAccount(BaseModel):
+class ChannelAccount(AgentsModel):
     """Channel account information needed to route a message.
 
     :param id: Channel id for the user or bot on this channel (Example:
@@ -19,8 +18,8 @@ class ChannelAccount(BaseModel):
     :type role: str or ~microsoft.agents.protocols.models.RoleTypes
     """
 
-    id: Optional[NonEmptyString] = Field(None, alias="id")
-    name: Optional[NonEmptyString] = Field(None, alias="name")
-    aad_object_id: Optional[NonEmptyString] = Field(None, alias="aadObjectId")
-    role: Optional[NonEmptyString] = Field(None, alias="role")
-    properties: Optional[object] = Field(None, alias="properties")
+    id: NonEmptyString
+    name: NonEmptyString = None
+    aad_object_id: NonEmptyString = None
+    role: NonEmptyString = None
+    properties: object = None

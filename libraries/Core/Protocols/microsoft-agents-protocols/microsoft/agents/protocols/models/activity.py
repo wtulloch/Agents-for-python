@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
-from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import Field
 from .activity_types import ActivityTypes
 from .channel_account import ChannelAccount
 from .conversation_account import ConversationAccount
@@ -13,10 +12,11 @@ from .entity import Entity
 from .conversation_reference import ConversationReference
 from .text_highlight import TextHighlight
 from .semantic_action import SemanticAction
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class Activity(BaseModel):
+class Activity(AgentsModel):
     """An Activity is the basic communication type for the Bot Framework 3.0
     protocol.
 
@@ -154,56 +154,48 @@ class Activity(BaseModel):
     :type caller_id: str
     """
 
-    type: NonEmptyString = Field(None, alias="type")
-    id: Optional[NonEmptyString] = Field(None, alias="id")
-    timestamp: Optional[datetime] = Field(None, alias="timestamp")
-    local_timestamp: Optional[datetime] = Field(None, alias="localTimestamp")
-    local_timezone: Optional[NonEmptyString] = Field(None, alias="localTimezone")
-    service_url: Optional[NonEmptyString] = Field(None, alias="serviceUrl")
-    channel_id: Optional[NonEmptyString] = Field(None, alias="channelId")
-    from_property: Optional[ChannelAccount] = Field(None, alias="from")
-    conversation: Optional[ConversationAccount] = Field(None, alias="conversation")
-    recipient: Optional[ChannelAccount] = Field(None, alias="recipient")
-    text_format: Optional[NonEmptyString] = Field(None, alias="textFormat")
-    attachment_layout: Optional[NonEmptyString] = Field(None, alias="attachmentLayout")
-    members_added: Optional[list[ChannelAccount]] = Field(None, alias="membersAdded")
-    members_removed: Optional[list[ChannelAccount]] = Field(
-        None, alias="membersRemoved"
-    )
-    reactions_added: Optional[list[MessageReaction]] = Field(
-        None, alias="reactionsAdded"
-    )
-    reactions_removed: Optional[list[MessageReaction]] = Field(
-        None, alias="reactionsRemoved"
-    )
-    topic_name: Optional[NonEmptyString] = Field(None, alias="topicName")
-    history_disclosed: Optional[bool] = Field(None, alias="historyDisclosed")
-    locale: Optional[NonEmptyString] = Field(None, alias="locale")
-    text: Optional[NonEmptyString] = Field(None, alias="text")
-    speak: Optional[NonEmptyString] = Field(None, alias="speak")
-    input_hint: Optional[NonEmptyString] = Field(None, alias="inputHint")
-    summary: Optional[NonEmptyString] = Field(None, alias="summary")
-    suggested_actions: Optional[SuggestedActions] = Field(
-        None, alias="suggestedActions"
-    )
-    attachments: Optional[list[Attachment]] = Field(None, alias="attachments")
-    entities: Optional[list[Entity]] = Field(None, alias="entities")
-    channel_data: Optional[object] = Field(None, alias="channelData")
-    action: Optional[NonEmptyString] = Field(None, alias="action")
-    reply_to_id: Optional[NonEmptyString] = Field(None, alias="replyToId")
-    label: Optional[NonEmptyString] = Field(None, alias="label")
-    value_type: Optional[NonEmptyString] = Field(None, alias="valueType")
-    value: Optional[object] = Field(None, alias="value")
-    name: Optional[NonEmptyString] = Field(None, alias="name")
-    relates_to: Optional[ConversationReference] = Field(None, alias="relatesTo")
-    code: Optional[NonEmptyString] = Field(None, alias="code")
-    expiration: Optional[datetime] = Field(None, alias="expiration")
-    importance: Optional[NonEmptyString] = Field(None, alias="importance")
-    delivery_mode: Optional[NonEmptyString] = Field(None, alias="deliveryMode")
-    listen_for: Optional[list[NonEmptyString]] = Field(None, alias="listenFor")
-    text_highlights: Optional[list[TextHighlight]] = Field(None, alias="textHighlights")
-    semantic_action: Optional[SemanticAction] = Field(None, alias="semanticAction")
-    caller_id: Optional[NonEmptyString] = Field(None, alias="callerId")
+    type: NonEmptyString
+    id: NonEmptyString = None
+    timestamp: datetime = None
+    local_timestamp: datetime = None
+    local_timezone: NonEmptyString = None
+    service_url: NonEmptyString = None
+    channel_id: NonEmptyString = None
+    from_property: ChannelAccount = Field(None, alias="from")
+    conversation: ConversationAccount = None
+    recipient: ChannelAccount = None
+    text_format: NonEmptyString = None
+    attachment_layout: NonEmptyString = None
+    members_added: list[ChannelAccount] = None
+    members_removed: list[ChannelAccount] = None
+    reactions_added: list[MessageReaction] = None
+    reactions_removed: list[MessageReaction] = None
+    topic_name: NonEmptyString = None
+    history_disclosed: bool = None
+    locale: NonEmptyString = None
+    text: NonEmptyString = None
+    speak: NonEmptyString = None
+    input_hint: NonEmptyString = None
+    summary: NonEmptyString = None
+    suggested_actions: SuggestedActions = None
+    attachments: list[Attachment] = None
+    entities: list[Entity] = None
+    channel_data: object = None
+    action: NonEmptyString = None
+    reply_to_id: NonEmptyString = None
+    label: NonEmptyString = None
+    value_type: NonEmptyString = None
+    value: object = None
+    name: NonEmptyString = None
+    relates_to: ConversationReference = None
+    code: NonEmptyString = None
+    expiration: datetime = None
+    importance: NonEmptyString = None
+    delivery_mode: NonEmptyString = None
+    listen_for: list[NonEmptyString] = None
+    text_highlights: list[TextHighlight] = None
+    semantic_action: SemanticAction = None
+    caller_id: NonEmptyString = None
 
     def apply_conversation_reference(
         self, reference: ConversationReference, is_incoming: bool = False

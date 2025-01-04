@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class ThumbnailUrl(BaseModel):
+class ThumbnailUrl(AgentsModel):
     """Thumbnail URL.
 
     :param url: URL pointing to the thumbnail to use for media content
@@ -12,5 +11,5 @@ class ThumbnailUrl(BaseModel):
     :type alt: str
     """
 
-    url: Optional[NonEmptyString] = Field(None, alias="url")
-    alt: Optional[NonEmptyString] = Field(None, alias="alt")
+    url: NonEmptyString = None
+    alt: NonEmptyString = None

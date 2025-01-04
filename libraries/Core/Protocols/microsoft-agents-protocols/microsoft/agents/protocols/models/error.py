@@ -1,10 +1,9 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from .inner_http_error import InnerHttpError
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class Error(BaseModel):
+class Error(AgentsModel):
     """Object representing error information.
 
     :param code: Error code
@@ -15,6 +14,6 @@ class Error(BaseModel):
     :type inner_http_error: ~microsoft.agents.protocols.models.InnerHttpError
     """
 
-    code: Optional[NonEmptyString] = Field(None, alias="code")
-    message: Optional[NonEmptyString] = Field(None, alias="message")
-    inner_http_error: Optional[InnerHttpError] = Field(None, alias="innerHttpError")
+    code: NonEmptyString = None
+    message: NonEmptyString = None
+    inner_http_error: InnerHttpError = None

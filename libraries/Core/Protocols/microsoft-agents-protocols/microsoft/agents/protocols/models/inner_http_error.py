@@ -1,8 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 
 
-class InnerHttpError(BaseModel):
+class InnerHttpError(AgentsModel):
     """Object representing inner http error.
 
     :param status_code: HttpStatusCode from failed request
@@ -11,5 +10,5 @@ class InnerHttpError(BaseModel):
     :type body: object
     """
 
-    status_code: Optional[int] = Field(None, alias="statusCode")
-    body: Optional[object] = Field(None, alias="body")
+    status_code: int = None
+    body: object = None

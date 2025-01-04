@@ -1,8 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 
 
-class InvokeResponse(BaseModel):
+class InvokeResponse(AgentsModel):
     """
     Tuple class containing an HTTP Status Code and a JSON serializable
     object. The HTTP Status code is, in the invoke activity scenario, what will
@@ -13,8 +12,8 @@ class InvokeResponse(BaseModel):
     the content is and deserialize as needed.
     """
 
-    status: Optional[int] = Field(None, alias="status")
-    body: Optional[object] = Field(None, alias="body")
+    status: int = None
+    body: object = None
 
     def is_successful_status_code(self) -> bool:
         """

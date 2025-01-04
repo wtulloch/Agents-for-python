@@ -1,12 +1,11 @@
-from typing import Optional
-from pydantic import BaseModel, Field
 from .thumbnail_url import ThumbnailUrl
 from .media_url import MediaUrl
 from .card_action import CardAction
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class AnimationCard(BaseModel):
+class AnimationCard(AgentsModel):
     """An animation card (Ex: gif or short video clip).
 
     :param title: Title of this card
@@ -41,15 +40,15 @@ class AnimationCard(BaseModel):
     :type value: object
     """
 
-    title: Optional[NonEmptyString] = Field(None, alias="title")
-    subtitle: Optional[NonEmptyString] = Field(None, alias="subtitle")
-    text: Optional[NonEmptyString] = Field(None, alias="text")
-    image: Optional[ThumbnailUrl] = Field(None, alias="image")
-    media: Optional[list[MediaUrl]] = Field(None, alias="media")
-    buttons: Optional[list[CardAction]] = Field(None, alias="buttons")
-    shareable: Optional[bool] = Field(None, alias="shareable")
-    autoloop: Optional[bool] = Field(None, alias="autoloop")
-    autostart: Optional[bool] = Field(None, alias="autostart")
-    aspect: Optional[NonEmptyString] = Field(None, alias="aspect")
-    duration: Optional[NonEmptyString] = Field(None, alias="duration")
-    value: Optional[object] = Field(None, alias="value")
+    title: NonEmptyString = None
+    subtitle: NonEmptyString = None
+    text: NonEmptyString = None
+    image: ThumbnailUrl = None
+    media: list[MediaUrl] = None
+    buttons: list[CardAction] = None
+    shareable: bool = None
+    autoloop: bool = None
+    autostart: bool = None
+    aspect: NonEmptyString = None
+    duration: NonEmptyString = None
+    value: object = None

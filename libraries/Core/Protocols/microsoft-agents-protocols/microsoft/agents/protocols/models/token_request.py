@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class TokenRequest(BaseModel):
+class TokenRequest(AgentsModel):
     """A request to receive a user token.
 
     :param provider: The provider to request a user token from
@@ -13,5 +12,5 @@ class TokenRequest(BaseModel):
     :type settings: dict[str, object]
     """
 
-    provider: Optional[NonEmptyString] = Field(None, alias="provider")
-    settings: Optional[dict] = Field(None, alias="settings")
+    provider: NonEmptyString = None
+    settings: dict = None

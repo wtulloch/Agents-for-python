@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class Fact(BaseModel):
+class Fact(AgentsModel):
     """Set of key-value pairs. Advantage of this section is that key and value
     properties will be
     rendered with default style information with some delimiter between them.
@@ -15,5 +14,5 @@ class Fact(BaseModel):
     :type value: str
     """
 
-    key: Optional[NonEmptyString] = Field(None, alias="key")
-    value: Optional[NonEmptyString] = Field(None, alias="value")
+    key: NonEmptyString = None
+    value: NonEmptyString = None

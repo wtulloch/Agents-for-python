@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class GeoCoordinates(BaseModel):
+class GeoCoordinates(AgentsModel):
     """GeoCoordinates (entity type: "https://schema.org/GeoCoordinates").
 
     :param elevation: Elevation of the location [WGS
@@ -21,8 +20,8 @@ class GeoCoordinates(BaseModel):
     :type name: str
     """
 
-    elevation: Optional[float] = Field(None, alias="elevation")
-    latitude: Optional[float] = Field(None, alias="latitude")
-    longitude: Optional[float] = Field(None, alias="longitude")
-    type: Optional[NonEmptyString] = Field(None, alias="type")
-    name: Optional[NonEmptyString] = Field(None, alias="name")
+    elevation: float = None
+    latitude: float = None
+    longitude: float = None
+    type: NonEmptyString = None
+    name: NonEmptyString = None

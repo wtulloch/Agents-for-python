@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class Thing(BaseModel):
+class Thing(AgentsModel):
     """Thing (entity type: "https://schema.org/Thing").
 
     :param type: The type of the thing
@@ -12,5 +11,5 @@ class Thing(BaseModel):
     :type name: str
     """
 
-    type: Optional[NonEmptyString] = Field(None, alias="type")
-    name: Optional[NonEmptyString] = Field(None, alias="name")
+    type: NonEmptyString = None
+    name: NonEmptyString = None

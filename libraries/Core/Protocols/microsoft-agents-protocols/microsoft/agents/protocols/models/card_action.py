@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class CardAction(BaseModel):
+class CardAction(AgentsModel):
     """A clickable action.
 
     :param type: The type of action implemented by this button. Possible
@@ -29,11 +28,11 @@ class CardAction(BaseModel):
     :type image_alt_text: str
     """
 
-    type: Optional[NonEmptyString] = Field(None, alias="type")
-    title: Optional[NonEmptyString] = Field(None, alias="title")
-    image: Optional[NonEmptyString] = Field(None, alias="image")
-    text: Optional[NonEmptyString] = Field(None, alias="text")
-    display_text: Optional[NonEmptyString] = Field(None, alias="displayText")
-    value: Optional[object] = Field(None, alias="value")
-    channel_data: Optional[object] = Field(None, alias="channelData")
-    image_alt_text: Optional[NonEmptyString] = Field(None, alias="imageAltText")
+    type: NonEmptyString
+    title: NonEmptyString
+    image: NonEmptyString = None
+    text: NonEmptyString = None
+    display_text: NonEmptyString = None
+    value: object = None
+    channel_data: object = None
+    image_alt_text: NonEmptyString = None

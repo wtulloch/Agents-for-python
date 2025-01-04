@@ -1,12 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from pydantic import BaseModel, Field
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
-from typing import Optional
 
 
-class TokenResponse(BaseModel):
+class TokenResponse(AgentsModel):
     """A response that includes a user token.
 
     :param connection_name: The connection name
@@ -20,7 +19,7 @@ class TokenResponse(BaseModel):
     :type channel_id: str
     """
 
-    connection_name: Optional[NonEmptyString] = Field(None, alias="connectionName")
-    token: Optional[NonEmptyString] = Field(None, alias="token")
-    expiration: Optional[NonEmptyString] = Field(None, alias="expiration")
-    channel_id: Optional[NonEmptyString] = Field(None, alias="channelId")
+    connection_name: NonEmptyString = None
+    token: NonEmptyString = None
+    expiration: NonEmptyString = None
+    channel_id: NonEmptyString = None

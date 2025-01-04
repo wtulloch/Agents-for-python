@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class Place(BaseModel):
+class Place(AgentsModel):
     """Place (entity type: "https://schema.org/Place").
 
     :param address: Address of the place (may be `string` or complex object of
@@ -21,8 +20,8 @@ class Place(BaseModel):
     :type name: str
     """
 
-    address: Optional[object] = Field(None, alias="address")
-    geo: Optional[object] = Field(None, alias="geo")
-    has_map: Optional[object] = Field(None, alias="hasMap")
-    type: Optional[NonEmptyString] = Field(None, alias="type")
-    name: Optional[NonEmptyString] = Field(None, alias="name")
+    address: object = None
+    geo: object = None
+    has_map: object = None
+    type: NonEmptyString = None
+    name: NonEmptyString = None

@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
-from typing import Optional
 
 
-class TokenExchangeInvokeResponse(BaseModel):
+class TokenExchangeInvokeResponse(AgentsModel):
     """TokenExchangeInvokeResponse.
 
     :param id: The id from the OAuthCard.
@@ -16,7 +15,7 @@ class TokenExchangeInvokeResponse(BaseModel):
     :type properties: dict[str, object]
     """
 
-    id: Optional[NonEmptyString] = Field(None, alias="id")
-    connection_name: Optional[NonEmptyString] = Field(None, alias="connectionName")
-    failure_detail: Optional[NonEmptyString] = Field(None, alias="failureDetail")
-    properties: Optional[dict] = Field(None, alias="properties")
+    id: NonEmptyString = None
+    connection_name: NonEmptyString = None
+    failure_detail: NonEmptyString = None
+    properties: dict = None

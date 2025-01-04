@@ -1,10 +1,9 @@
-from pydantic import BaseModel, Field
 from .channel_account import ChannelAccount
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
-from typing import Optional
 
 
-class Mention(BaseModel):
+class Mention(AgentsModel):
     """Mention information (entity type: "mention").
 
     :param mentioned: The mentioned user
@@ -15,6 +14,6 @@ class Mention(BaseModel):
     :type type: str
     """
 
-    mentioned: Optional[ChannelAccount] = Field(None, alias="mentioned")
-    text: Optional[NonEmptyString] = Field(None, alias="text")
-    type: Optional[NonEmptyString] = Field(None, alias="type")
+    mentioned: ChannelAccount = None
+    text: NonEmptyString = None
+    type: NonEmptyString = None

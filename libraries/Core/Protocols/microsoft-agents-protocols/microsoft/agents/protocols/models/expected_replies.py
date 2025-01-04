@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from .activity import Activity
+from ._agents_model import AgentsModel
 
 
-class ExpectedReplies(BaseModel):
+class ExpectedReplies(AgentsModel):
     """ExpectedReplies.
 
     :param activities: A collection of Activities that conforms to the
@@ -11,4 +10,4 @@ class ExpectedReplies(BaseModel):
     :type activities: list[~microsoft.agents.protocols.models.Activity]
     """
 
-    activities: Optional[list[Activity]] = Field(None, alias="activities")
+    activities: list[Activity] = None

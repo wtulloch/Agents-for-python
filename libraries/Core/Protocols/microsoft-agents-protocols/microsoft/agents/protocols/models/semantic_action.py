@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
-from typing import Optional
 
 
-class SemanticAction(BaseModel):
+class SemanticAction(AgentsModel):
     """Represents a reference to a programmatic action.
 
     :param id: ID of this action
@@ -14,6 +13,6 @@ class SemanticAction(BaseModel):
     :type state: str or ~microsoft.agents.protocols.models.SemanticActionStates
     """
 
-    id: Optional[NonEmptyString] = Field(None, alias="id")
-    entities: Optional[dict] = Field(None, alias="entities")
-    state: Optional[NonEmptyString] = Field(None, alias="state")
+    id: NonEmptyString
+    entities: dict = None
+    state: NonEmptyString = None

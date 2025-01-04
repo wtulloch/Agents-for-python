@@ -1,11 +1,10 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from .channel_account import ChannelAccount
 from .conversation_account import ConversationAccount
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class ConversationReference(BaseModel):
+class ConversationReference(AgentsModel):
     """An object relating to a particular point in a conversation.
 
     :param activity_id: (Optional) ID of the activity to refer to
@@ -29,10 +28,10 @@ class ConversationReference(BaseModel):
     :type service_url: str
     """
 
-    activity_id: Optional[NonEmptyString] = Field(None, alias="activityId")
-    user: Optional[ChannelAccount] = Field(None, alias="user")
-    bot: Optional[ChannelAccount] = Field(None, alias="bot")
-    conversation: Optional[ConversationAccount] = Field(None, alias="conversation")
-    channel_id: Optional[NonEmptyString] = Field(None, alias="channelId")
-    locale: Optional[NonEmptyString] = Field(None, alias="locale")
-    service_url: Optional[NonEmptyString] = Field(None, alias="serviceUrl")
+    activity_id: NonEmptyString = None
+    user: ChannelAccount = None
+    bot: ChannelAccount
+    conversation: ConversationAccount
+    channel_id: NonEmptyString
+    locale: NonEmptyString = None
+    service_url: NonEmptyString

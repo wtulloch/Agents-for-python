@@ -1,11 +1,10 @@
-from typing import Optional
-from pydantic import BaseModel, Field
 from .adaptive_card_invoke_action import AdaptiveCardInvokeAction
 from .token_exchange_invoke_request import TokenExchangeInvokeRequest
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class AdaptiveCardInvokeValue(BaseModel):
+class AdaptiveCardInvokeValue(AgentsModel):
     """AdaptiveCardInvokeResponse.
 
     Defines the structure that arrives in the Activity.Value for Invoke activity with Name of 'adaptiveCard/action'.
@@ -18,8 +17,6 @@ class AdaptiveCardInvokeValue(BaseModel):
     :type state: str
     """
 
-    action: Optional[AdaptiveCardInvokeAction] = Field(None, alias="action")
-    authentication: Optional[TokenExchangeInvokeRequest] = Field(
-        None, alias="authentication"
-    )
-    state: Optional[NonEmptyString] = Field(None, alias="state")
+    action: AdaptiveCardInvokeAction = None
+    authentication: TokenExchangeInvokeRequest = None
+    state: NonEmptyString = None

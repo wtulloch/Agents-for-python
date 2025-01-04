@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class MediaUrl(BaseModel):
+class MediaUrl(AgentsModel):
     """Media URL.
 
     :param url: Url for the media
@@ -13,5 +12,5 @@ class MediaUrl(BaseModel):
     :type profile: str
     """
 
-    url: Optional[NonEmptyString] = Field(None, alias="url")
-    profile: Optional[NonEmptyString] = Field(None, alias="profile")
+    url: NonEmptyString = None
+    profile: NonEmptyString = None

@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class ConversationResourceResponse(BaseModel):
+class ConversationResourceResponse(AgentsModel):
     """A response containing a resource.
 
     :param activity_id: ID of the Activity (if sent)
@@ -15,6 +14,6 @@ class ConversationResourceResponse(BaseModel):
     :type id: str
     """
 
-    activity_id: Optional[NonEmptyString] = Field(None, alias="activityId")
-    service_url: Optional[NonEmptyString] = Field(None, alias="serviceUrl")
-    id: Optional[NonEmptyString] = Field(None, alias="id")
+    activity_id: NonEmptyString = None
+    service_url: NonEmptyString = None
+    id: NonEmptyString = None

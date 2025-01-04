@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class MessageReaction(BaseModel):
+class MessageReaction(AgentsModel):
     """Message reaction object.
 
     :param type: Message reaction type. Possible values include: 'like',
@@ -11,4 +10,4 @@ class MessageReaction(BaseModel):
     :type type: str or ~microsoft.agents.protocols.models.MessageReactionTypes
     """
 
-    type: Optional[NonEmptyString] = Field(None, alias="type")
+    type: NonEmptyString

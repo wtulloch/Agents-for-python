@@ -1,10 +1,9 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from .card_action import CardAction
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class CardImage(BaseModel):
+class CardImage(AgentsModel):
     """An image on a card.
 
     :param url: URL thumbnail image for major content property
@@ -15,6 +14,6 @@ class CardImage(BaseModel):
     :type tap: ~microsoft.agents.protocols.models.CardAction
     """
 
-    url: Optional[NonEmptyString] = Field(None, alias="url")
-    alt: Optional[NonEmptyString] = Field(None, alias="alt")
-    tap: Optional[CardAction] = Field(None, alias="tap")
+    url: NonEmptyString = None
+    alt: NonEmptyString = None
+    tap: CardAction = None

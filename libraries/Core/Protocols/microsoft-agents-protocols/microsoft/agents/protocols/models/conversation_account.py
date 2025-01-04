@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class ConversationAccount(BaseModel):
+class ConversationAccount(AgentsModel):
     """Conversation account represents the identity of the conversation within a channel.
 
     :param is_group: Indicates whether the conversation contains more than two
@@ -29,11 +28,11 @@ class ConversationAccount(BaseModel):
     :type properties: object
     """
 
-    is_group: Optional[bool] = Field(None, alias="isGroup")
-    conversation_type: Optional[NonEmptyString] = Field(None, alias="conversationType")
-    id: Optional[NonEmptyString] = Field(None, alias="id")
-    name: Optional[NonEmptyString] = Field(None, alias="name")
-    aad_object_id: Optional[NonEmptyString] = Field(None, alias="aadObjectId")
-    role: Optional[NonEmptyString] = Field(None, alias="role")
-    tenant_id: Optional[NonEmptyString] = Field(None, alias="tenantID")
-    properties: Optional[object] = Field(None, alias="properties")
+    is_group: bool = None
+    conversation_type: NonEmptyString = None
+    id: NonEmptyString
+    name: NonEmptyString = None
+    aad_object_id: NonEmptyString = None
+    role: NonEmptyString = None
+    tenant_id: NonEmptyString = None
+    properties: object = None

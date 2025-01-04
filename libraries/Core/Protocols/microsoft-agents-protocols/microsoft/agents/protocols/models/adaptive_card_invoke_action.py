@@ -1,9 +1,8 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class AdaptiveCardInvokeAction(BaseModel):
+class AdaptiveCardInvokeAction(AgentsModel):
     """AdaptiveCardInvokeAction.
 
     Defines the structure that arrives in the Activity.Value.Action for Invoke activity with
@@ -19,7 +18,7 @@ class AdaptiveCardInvokeAction(BaseModel):
     :type data: dict[str, object]
     """
 
-    type: Optional[NonEmptyString] = Field(None, alias="type")
-    id: Optional[NonEmptyString] = Field(None, alias="id")
-    verb: Optional[NonEmptyString] = Field(None, alias="verb")
-    data: Optional[dict[NonEmptyString, object]] = Field(None, alias="data")
+    type: NonEmptyString = None
+    id: NonEmptyString = None
+    verb: NonEmptyString = None
+    data: dict[NonEmptyString, object] = None

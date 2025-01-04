@@ -1,9 +1,8 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class AdaptiveCardInvokeResponse(BaseModel):
+class AdaptiveCardInvokeResponse(AgentsModel):
     """AdaptiveCardInvokeResponse.
 
     Defines the structure that is returned as the result of an Invoke activity with Name of 'adaptiveCard/action'.
@@ -16,6 +15,6 @@ class AdaptiveCardInvokeResponse(BaseModel):
     :type value: dict[str, object]
     """
 
-    status_code: Optional[int] = Field(None, alias="statusCode")
-    type: Optional[NonEmptyString] = Field(None, alias="type")
-    value: Optional[dict[NonEmptyString, object]] = Field(None, alias="value")
+    status_code: int = None
+    type: NonEmptyString = None
+    value: dict[NonEmptyString, object] = None

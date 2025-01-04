@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-class TextHighlight(BaseModel):
+class TextHighlight(AgentsModel):
     """Refers to a substring of content within another field.
 
     :param text: Defines the snippet of text to highlight
@@ -13,5 +12,5 @@ class TextHighlight(BaseModel):
     :type occurrence: int
     """
 
-    text: Optional[NonEmptyString] = Field(None, alias="text")
-    occurrence: Optional[int] = Field(None, alias="occurrence")
+    text: NonEmptyString
+    occurrence: int

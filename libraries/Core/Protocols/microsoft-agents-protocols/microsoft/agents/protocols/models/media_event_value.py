@@ -1,8 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from ._agents_model import AgentsModel
 
 
-class MediaEventValue(BaseModel):
+class MediaEventValue(AgentsModel):
     """Supplementary parameter for media events.
 
     :param card_value: Callback parameter specified in the Value field of the
@@ -10,4 +9,4 @@ class MediaEventValue(BaseModel):
     :type card_value: object
     """
 
-    card_value: Optional[object] = Field(None, alias="cardValue")
+    card_value: object = None
