@@ -8,5 +8,7 @@ class Entity(AgentsModel):
     :param type: Type of this entity (RFC 3987 IRI)
     :type type: str
     """
+    class Config:
+        extra = "allow"
 
     type: NonEmptyString = None
