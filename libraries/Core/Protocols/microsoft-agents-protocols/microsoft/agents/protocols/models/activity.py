@@ -17,82 +17,60 @@ from ._type_aliases import NonEmptyString
 
 
 class Activity(AgentsModel):
-    """An Activity is the basic communication type for the Bot Framework 3.0
-    protocol.
+    """An Activity is the basic communication type for the Bot Framework 3.0 protocol.
 
     :param type: Contains the activity type. Possible values include:
-     'message', 'contactRelationUpdate', 'conversationUpdate', 'typing',
-     'endOfConversation', 'event', 'invoke', 'deleteUserData', 'messageUpdate',
-     'messageDelete', 'installationUpdate', 'messageReaction', 'suggestion',
-     'trace', 'handoff'
+        'message', 'contactRelationUpdate', 'conversationUpdate', 'typing',
+        'endOfConversation', 'event', 'invoke', 'deleteUserData', 'messageUpdate',
+        'messageDelete', 'installationUpdate', 'messageReaction', 'suggestion',
+        'trace', 'handoff'
     :type type: str or ~microsoft.agents.protocols.models.ActivityTypes
-    :param id: Contains an ID that uniquely identifies the activity on the
-     channel.
+    :param id: Contains an ID that uniquely identifies the activity on the channel.
     :type id: str
-    :param timestamp: Contains the date and time that the message was sent, in
-     UTC, expressed in ISO-8601 format.
+    :param timestamp: Contains the date and time that the message was sent, in UTC, expressed in ISO-8601 format.
     :type timestamp: datetime
-    :param local_timestamp: Contains the local date and time of the message
-     expressed in ISO-8601 format.
-     For example, 2016-09-23T13:07:49.4714686-07:00.
+    :param local_timestamp: Contains the local date and time of the message expressed in ISO-8601 format.
+        For example, 2016-09-23T13:07:49.4714686-07:00.
     :type local_timestamp: datetime
-    :param local_timezone: Contains the name of the local timezone of the message,
-     expressed in IANA Time Zone database format.
-     For example, America/Los_Angeles.
+    :param local_timezone: Contains the name of the local timezone of the message, expressed in IANA Time Zone database format.
+        For example, America/Los_Angeles.
     :type local_timezone: str
-    :param service_url: Contains the URL that specifies the channel's service
-     endpoint. Set by the channel.
+    :param service_url: Contains the URL that specifies the channel's service endpoint. Set by the channel.
     :type service_url: str
-    :param channel_id: Contains an ID that uniquely identifies the channel.
-     Set by the channel.
+    :param channel_id: Contains an ID that uniquely identifies the channel. Set by the channel.
     :type channel_id: str
     :param from_property: Identifies the sender of the message.
     :type from_property: ~microsoft.agents.protocols.models.ChannelAccount
-    :param conversation: Identifies the conversation to which the activity
-     belongs.
+    :param conversation: Identifies the conversation to which the activity belongs.
     :type conversation: ~microsoft.agents.protocols.models.ConversationAccount
     :param recipient: Identifies the recipient of the message.
     :type recipient: ~microsoft.agents.protocols.models.ChannelAccount
-    :param text_format: Format of text fields Default:markdown. Possible
-     values include: 'markdown', 'plain', 'xml'
+    :param text_format: Format of text fields Default:markdown. Possible values include: 'markdown', 'plain', 'xml'
     :type text_format: str or ~microsoft.agents.protocols.models.TextFormatTypes
-    :param attachment_layout: The layout hint for multiple attachments.
-     Default: list. Possible values include: 'list', 'carousel'
-    :type attachment_layout: str or
-     ~microsoft.agents.protocols.models.AttachmentLayoutTypes
+    :param attachment_layout: The layout hint for multiple attachments. Default: list. Possible values include: 'list', 'carousel'
+    :type attachment_layout: str or ~microsoft.agents.protocols.models.AttachmentLayoutTypes
     :param members_added: The collection of members added to the conversation.
     :type members_added: list[~microsoft.agents.protocols.models.ChannelAccount]
-    :param members_removed: The collection of members removed from the
-     conversation.
+    :param members_removed: The collection of members removed from the conversation.
     :type members_removed: list[~microsoft.agents.protocols.models.ChannelAccount]
-    :param reactions_added: The collection of reactions added to the
-     conversation.
-    :type reactions_added:
-     list[~microsoft.agents.protocols.models.MessageReaction]
-    :param reactions_removed: The collection of reactions removed from the
-     conversation.
-    :type reactions_removed:
-     list[~microsoft.agents.protocols.models.MessageReaction]
+    :param reactions_added: The collection of reactions added to the conversation.
+    :type reactions_added: list[~microsoft.agents.protocols.models.MessageReaction]
+    :param reactions_removed: The collection of reactions removed from the conversation.
+    :type reactions_removed: list[~microsoft.agents.protocols.models.MessageReaction]
     :param topic_name: The updated topic name of the conversation.
     :type topic_name: str
-    :param history_disclosed: Indicates whether the prior history of the
-     channel is disclosed.
+    :param history_disclosed: Indicates whether the prior history of the channel is disclosed.
     :type history_disclosed: bool
-    :param locale: A locale name for the contents of the text field.
-     The locale name is a combination of an ISO 639 two- or three-letter
-     culture code associated with a language
-     and an ISO 3166 two-letter subculture code associated with a country or
-     region.
-     The locale name can also correspond to a valid BCP-47 language tag.
+    :param locale: A locale name for the contents of the text field. The locale name is a combination of an ISO 639 two- or three-letter
+        culture code associated with a language and an ISO 3166 two-letter subculture code associated with a country or region.
+        The locale name can also correspond to a valid BCP-47 language tag.
     :type locale: str
     :param text: The text content of the message.
     :type text: str
     :param speak: The text to speak.
     :type speak: str
-    :param input_hint: Indicates whether your bot is accepting,
-     expecting, or ignoring user input after the message is delivered to the
-     client. Possible values include: 'acceptingInput', 'ignoringInput',
-     'expectingInput'
+    :param input_hint: Indicates whether your bot is accepting, expecting, or ignoring user input after the message is delivered to the client.
+        Possible values include: 'acceptingInput', 'ignoringInput', 'expectingInput'
     :type input_hint: str or ~microsoft.agents.protocols.models.InputHints
     :param summary: The text to display if the channel cannot render cards.
     :type summary: str
@@ -100,16 +78,13 @@ class Activity(AgentsModel):
     :type suggested_actions: ~microsoft.agents.protocols.models.SuggestedActions
     :param attachments: Attachments
     :type attachments: list[~microsoft.agents.protocols.models.Attachment]
-    :param entities: Represents the entities that were mentioned in the
-     message.
+    :param entities: Represents the entities that were mentioned in the message.
     :type entities: list[~microsoft.agents.protocols.models.Entity]
     :param channel_data: Contains channel-specific content.
     :type channel_data: object
-    :param action: Indicates whether the recipient of a contactRelationUpdate
-     was added or removed from the sender's contact list.
+    :param action: Indicates whether the recipient of a contactRelationUpdate was added or removed from the sender's contact list.
     :type action: str
-    :param reply_to_id: Contains the ID of the message to which this message
-     is a reply.
+    :param reply_to_id: Contains the ID of the message to which this message is a reply.
     :type reply_to_id: str
     :param label: A descriptive label for the activity.
     :type label: str
@@ -117,40 +92,28 @@ class Activity(AgentsModel):
     :type value_type: str
     :param value: A value that is associated with the activity.
     :type value: object
-    :param name: The name of the operation associated with an invoke or event
-     activity.
+    :param name: The name of the operation associated with an invoke or event activity.
     :type name: str
     :param relates_to: A reference to another conversation or activity.
     :type relates_to: ~microsoft.agents.protocols.models.ConversationReference
-    :param code: The a code for endOfConversation activities that indicates
-     why the conversation ended. Possible values include: 'unknown',
-     'completedSuccessfully', 'userCancelled', 'botTimedOut',
-     'botIssuedInvalidMessage', 'channelFailed'
+    :param code: The a code for endOfConversation activities that indicates why the conversation ended. Possible values include: 'unknown',
+        'completedSuccessfully', 'userCancelled', 'botTimedOut', 'botIssuedInvalidMessage', 'channelFailed'
     :type code: str or ~microsoft.agents.protocols.models.EndOfConversationCodes
-    :param expiration: The time at which the activity should be considered to
-     be "expired" and should not be presented to the recipient.
+    :param expiration: The time at which the activity should be considered to be "expired" and should not be presented to the recipient.
     :type expiration: datetime
-    :param importance: The importance of the activity. Possible values
-     include: 'low', 'normal', 'high'
+    :param importance: The importance of the activity. Possible values include: 'low', 'normal', 'high'
     :type importance: str or ~microsoft.agents.protocols.models.ActivityImportance
-    :param delivery_mode: A delivery hint to signal to the recipient alternate
-     delivery paths for the activity.
-     The default delivery mode is "default". Possible values include: 'normal',
-     'notification', 'expectReplies', 'ephemeral'
+    :param delivery_mode: A delivery hint to signal to the recipient alternate delivery paths for the activity.
+        The default delivery mode is "default". Possible values include: 'normal', 'notification', 'expectReplies', 'ephemeral'
     :type delivery_mode: str or ~microsoft.agents.protocols.models.DeliveryModes
-    :param listen_for: List of phrases and references that speech and language
-     priming systems should listen for
+    :param listen_for: List of phrases and references that speech and language priming systems should listen for
     :type listen_for: list[str]
-    :param text_highlights: The collection of text fragments to highlight when
-     the activity contains a ReplyToId value.
+    :param text_highlights: The collection of text fragments to highlight when the activity contains a ReplyToId value.
     :type text_highlights: list[~microsoft.agents.protocols.models.TextHighlight]
-    :param semantic_action: An optional programmatic action accompanying this
-     request
+    :param semantic_action: An optional programmatic action accompanying this request
     :type semantic_action: ~microsoft.agents.protocols.models.SemanticAction
-    :param caller_id: A string containing an IRI identifying the caller of a
-     bot. This field is not intended to be transmitted over the wire, but is
-     instead populated by bots and clients based on cryptographically
-     verifiable data that asserts the identity of the callers (e.g. tokens).
+    :param caller_id: A string containing an IRI identifying the caller of a bot. This field is not intended to be transmitted over the wire,
+        but is instead populated by bots and clients based on cryptographically verifiable data that asserts the identity of the callers (e.g. tokens).
     :type caller_id: str
     """
 
@@ -201,18 +164,16 @@ class Activity(AgentsModel):
         self, reference: ConversationReference, is_incoming: bool = False
     ):
         """
-        Updates this activity with the delivery information from an existing ConversationReference
+        Updates this activity with the delivery information from an existing ConversationReference.
 
         :param reference: The existing conversation reference.
-        :param is_incoming: Optional, True to treat the activity as an
-        incoming activity, where the bot is the recipient; otherwise, False.
-        Default is False, and the activity will show the bot as the sender.
+        :param is_incoming: Optional, True to treat the activity as an incoming activity, where the bot is the recipient; otherwise, False.
+            Default is False, and the activity will show the bot as the sender.
 
-        :returns: his activity, updated with the delivery information.
+        :returns: This activity, updated with the delivery information.
 
         .. remarks::
-            Call GetConversationReference on an incoming
-            activity to get a conversation reference that you can then use to update an
+            Call GetConversationReference on an incoming activity to get a conversation reference that you can then use to update an
             outgoing activity with the correct delivery information.
         """
         self.channel_id = reference.channel_id
@@ -239,8 +200,7 @@ class Activity(AgentsModel):
 
     def as_contact_relation_update_activity(self):
         """
-        Returns this activity as a ContactRelationUpdateActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as a ContactRelationUpdateActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as a message activity; or None.
         """
@@ -250,8 +210,7 @@ class Activity(AgentsModel):
 
     def as_conversation_update_activity(self):
         """
-        Returns this activity as a ConversationUpdateActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as a ConversationUpdateActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as a conversation update activity; or None.
         """
@@ -259,8 +218,7 @@ class Activity(AgentsModel):
 
     def as_end_of_conversation_activity(self):
         """
-        Returns this activity as an EndOfConversationActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as an EndOfConversationActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as an end of conversation activity; or None.
         """
@@ -268,8 +226,7 @@ class Activity(AgentsModel):
 
     def as_event_activity(self):
         """
-        Returns this activity as an EventActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as an EventActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as an event activity; or None.
         """
@@ -277,8 +234,7 @@ class Activity(AgentsModel):
 
     def as_handoff_activity(self):
         """
-        Returns this activity as a HandoffActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as a HandoffActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as a handoff activity; or None.
         """
@@ -286,8 +242,7 @@ class Activity(AgentsModel):
 
     def as_installation_update_activity(self):
         """
-        Returns this activity as an InstallationUpdateActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as an InstallationUpdateActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as an installation update activity; or None.
         """
@@ -295,8 +250,7 @@ class Activity(AgentsModel):
 
     def as_invoke_activity(self):
         """
-        Returns this activity as an InvokeActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as an InvokeActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as an invoke activity; or None.
         """
@@ -304,8 +258,7 @@ class Activity(AgentsModel):
 
     def as_message_activity(self):
         """
-        Returns this activity as a MessageActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as a MessageActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as a message activity; or None.
         """
@@ -313,8 +266,7 @@ class Activity(AgentsModel):
 
     def as_message_delete_activity(self):
         """
-        Returns this activity as a MessageDeleteActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as a MessageDeleteActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as a message delete request; or None.
         """
@@ -322,8 +274,7 @@ class Activity(AgentsModel):
 
     def as_message_reaction_activity(self):
         """
-        Returns this activity as a MessageReactionActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as a MessageReactionActivity object; or None, if this is not that type of activity.
 
         :return: This activity as a message reaction activity; or None.
         """
@@ -331,8 +282,7 @@ class Activity(AgentsModel):
 
     def as_message_update_activity(self):
         """
-        Returns this activity as an MessageUpdateActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as an MessageUpdateActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as a message update request; or None.
         """
@@ -340,8 +290,7 @@ class Activity(AgentsModel):
 
     def as_suggestion_activity(self):
         """
-        Returns this activity as a SuggestionActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as a SuggestionActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as a suggestion activity; or None.
         """
@@ -349,8 +298,7 @@ class Activity(AgentsModel):
 
     def as_trace_activity(self):
         """
-        Returns this activity as a TraceActivity object;
-        or None, if this is not that type of activity.
+        Returns this activity as a TraceActivity object; or None, if this is not that type of activity.
 
         :returns: This activity as a trace activity; or None.
         """
@@ -358,8 +306,7 @@ class Activity(AgentsModel):
 
     def as_typing_activity(self):
         """
-        Returns this activity as a TypingActivity object;
-        or null, if this is not that type of activity.
+        Returns this activity as a TypingActivity object; or null, if this is not that type of activity.
 
         :returns: This activity as a typing activity; or null.
         """
@@ -368,7 +315,7 @@ class Activity(AgentsModel):
     @staticmethod
     def create_contact_relation_update_activity():
         """
-        Creates an instance of the :class:`Activity` class as aContactRelationUpdateActivity object.
+        Creates an instance of the :class:`Activity` class as a ContactRelationUpdateActivity object.
 
         :returns: The new contact relation update activity.
         """
@@ -478,8 +425,7 @@ class Activity(AgentsModel):
 
         :param name: The name of the trace operation to create.
         :param value: Optional, the content for this trace operation.
-        :param value_type: Optional, identifier for the format of the value
-        Default is the name of type of the value.
+        :param value_type: Optional, identifier for the format of the value. Default is the name of type of the value.
         :param label: Optional, a descriptive label for this trace operation.
 
         :returns: The new trace activity.
@@ -526,8 +472,7 @@ class Activity(AgentsModel):
 
         :param name: The name of the trace operation to create.
         :param value: Optional, the content for this trace operation.
-        :param value_type: Optional, identifier for the format of the value.
-        Default is the name of type of the value.
+        :param value_type: Optional, identifier for the format of the value. Default is the name of type of the value.
         :param label: Optional, a descriptive label for this trace operation.
 
         :returns: The new trace activity.
@@ -580,9 +525,8 @@ class Activity(AgentsModel):
         :returns: The array of mentions; or an empty array, if none are found.
 
         .. remarks::
-            This method is defined on the :class:`Activity` class, but is only intended
-            for use with a message activity, where the activity Activity.Type is set to
-            ActivityTypes.Message.
+            This method is defined on the :class:`Activity` class, but is only intended for use with a message activity,
+            where the activity Activity.Type is set to ActivityTypes.Message.
         """
         _list = self.entities
         return [x for x in _list if str(x.type).lower() == "mention"]
@@ -591,8 +535,7 @@ class Activity(AgentsModel):
         self, reply: ResourceResponse
     ) -> ConversationReference:
         """
-        Create a ConversationReference based on this Activity's Conversation info
-        and the ResourceResponse from sending an activity.
+        Create a ConversationReference based on this Activity's Conversation info and the ResourceResponse from sending an activity.
 
         :param reply: ResourceResponse returned from send_activity.
 
@@ -609,9 +552,8 @@ class Activity(AgentsModel):
         :returns: True, if this activity has any content to send; otherwise, false.
 
         .. remarks::
-            This method is defined on the :class:`Activity` class, but is only intended
-            for use with a message activity, where the activity Activity.Type is set to
-            ActivityTypes.Message.
+            This method is defined on the :class:`Activity` class, but is only intended for use with a message activity,
+            where the activity Activity.Type is set to ActivityTypes.Message.
         """
         if self.text and self.text.strip():
             return True
@@ -629,9 +571,9 @@ class Activity(AgentsModel):
 
     def is_from_streaming_connection(self) -> bool:
         """
-        Determine if the Activity was sent via an Http/Https connection or Streaming
+        Determine if the Activity was sent via an Http/Https connection or Streaming.
         This can be determined by looking at the service_url property:
-        (1) All channels that send messages via http/https are not streaming
+        (1) All channels that send messages via http/https are not streaming.
         (2) Channels that send messages via streaming have a ServiceUrl that does not begin with http/https.
 
         :returns: True if the Activity originated from a streaming connection.
