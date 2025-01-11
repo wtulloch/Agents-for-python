@@ -1,3 +1,4 @@
+from copy import copy
 from datetime import datetime, timezone
 from pydantic import Field
 from .activity_types import ActivityTypes
@@ -506,13 +507,13 @@ class Activity(AgentsModel):
         return ConversationReference(
             activity_id=(
                 self.id
-                if type != ActivityTypes.conversation_update
+                if self.type != ActivityTypes.conversation_update
                 or self.channel_id not in ["directline", "webchat"]
                 else None
             ),
-            user=self.from_property,
-            bot=self.recipient,
-            conversation=self.conversation,
+            user=copy(self.from_property),
+            bot=copy(self.recipient),
+            conversation=copy(self.conversation),
             channel_id=self.channel_id,
             locale=self.locale,
             service_url=self.service_url,
