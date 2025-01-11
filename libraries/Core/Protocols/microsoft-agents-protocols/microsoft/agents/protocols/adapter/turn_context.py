@@ -154,7 +154,7 @@ class TurnContext:
 
     async def send_activity(
         self,
-        activity_or_text: Activity |str,
+        activity_or_text: Activity | str,
         speak: str = None,
         input_hint: str = None,
     ) -> ResourceResponse | None:
