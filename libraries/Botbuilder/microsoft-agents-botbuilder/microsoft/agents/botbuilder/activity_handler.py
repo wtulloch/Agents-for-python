@@ -82,7 +82,7 @@ class ActivityHandler(Bot):
 
             # If OnInvokeActivityAsync has already sent an InvokeResponse, do not send another one.
             if invoke_response and not turn_context.turn_state.get(
-                BotFrameworkAdapter._INVOKE_RESPONSE_KEY  # pylint: disable=protected-access
+                ActivityTypes.invoke_response
             ):
                 await turn_context.send_activity(
                     Activity(value=invoke_response, type=ActivityTypes.invoke_response)

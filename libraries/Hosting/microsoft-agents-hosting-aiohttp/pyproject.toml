@@ -14,8 +14,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "pydantic>=2.10.4",
+    "microsoft-agents-botbuilder",
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/microsoft/microsoft-agents-protocol"
+"Homepage" = "https://github.com/microsoft/Agents-for-python"
