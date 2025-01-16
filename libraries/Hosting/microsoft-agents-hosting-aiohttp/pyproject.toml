@@ -14,7 +14,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
+    "microsoft-agents-connector",
     "microsoft-agents-botbuilder",
+    "aiohttp>=3.11.11",
 ]
 
 [project.urls]
