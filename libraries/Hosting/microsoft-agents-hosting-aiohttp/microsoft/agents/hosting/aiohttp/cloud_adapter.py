@@ -17,6 +17,7 @@ from microsoft.agents.core.models import (
     Activity,
     InvokeResponse,
 )
+from microsoft.agents.connector import ConnectorClient
 from microsoft.agents.botbuilder import (
     Bot,
     ChannelServiceAdapter,
@@ -24,7 +25,6 @@ from microsoft.agents.botbuilder import (
 )
 from botbuilder.integration.aiohttp.streaming import AiohttpWebSocket
 from botframework.connector import AsyncBfPipeline, BotFrameworkConnectorConfiguration
-from botframework.connector.aio import ConnectorClient
 from botframework.connector.auth import (
     AuthenticateRequestResult,
     BotFrameworkAuthentication,

@@ -14,6 +14,9 @@ from azure.core.rest import AsyncHttpResponse, HttpRequest
 
 from ._serialization import Deserializer, Serializer
 from ._connector_client_configuration import ConnectorConfiguration
+from .attachments_base import AttachmentsBase
+from .conversations_base import ConversationsBase
+from .connector_client_base import ConnectorClientBase
 from .operations import (
     AttachmentsOperations,
     ConnectorInternalsOperations,
@@ -21,7 +24,7 @@ from .operations import (
 )
 
 
-class ConnectorClient:  # pylint: disable=client-accepts-api-version-keyword
+class ConnectorClient(ConnectorClientBase):  # pylint: disable=client-accepts-api-version-keyword
     """The Azure Bot Service Connector APIs allow bots to send and receive
     messages, button clicks, and other programmatic events when connecting with
     end users. This API also includes facilities to get conversation metadata
@@ -75,15 +78,27 @@ class ConnectorClient:  # pylint: disable=client-accepts-api-version-keyword
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
-        self.attachments = AttachmentsOperations(
+        self._attachments: AttachmentsBase = AttachmentsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.conversations = ConversationsOperations(
+        self._conversations: ConversationsBase = ConversationsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.connector_internals = ConnectorInternalsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+    
+    @property
+    def attachments(self) -> AttachmentsBase:
+        return self._attachments
+    
+    @property
+    def conversations(self) -> ConversationsBase:
+        return self._conversations
+    
+    @property
+    def base_uri(self) -> str:
+        return self._client.base_url
 
     def send_request(
         self, request: HttpRequest, *, stream: bool = False, **kwargs: Any

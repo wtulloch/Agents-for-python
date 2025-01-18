@@ -69,6 +69,10 @@ from .semantic_actions_states import SemanticActionsStates
 from .text_format_types import TextFormatTypes
 from .sign_in_constants import SignInConstants
 
+from .sign_in_resource import SignInResource
+from .token_exchange_resource import TokenExchangeResource
+from .token_post_resource import TokenPostResource
+
 __all__ = [
     "Activity",
     "ActivityEventNames",
@@ -138,4 +142,7 @@ __all__ = [
     "SemanticActionsStates",
     "TextFormatTypes",
     "SignInConstants",
+    "SignInResource",
+    "TokenExchangeResource",
+    "TokenPostResource",
 ]
