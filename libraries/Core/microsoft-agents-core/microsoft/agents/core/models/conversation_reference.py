@@ -1,7 +1,11 @@
+from uuid import uuid4 as uuid
+
 from .channel_account import ChannelAccount
 from .conversation_account import ConversationAccount
 from ._agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
+from .activity_types import ActivityTypes
+from .activity_event_names import ActivityEventNames
 
 
 class ConversationReference(AgentsModel):
@@ -35,3 +39,17 @@ class ConversationReference(AgentsModel):
     channel_id: NonEmptyString
     locale: NonEmptyString = None
     service_url: NonEmptyString
+    
+    def get_continuation_activity(self) -> 'Activity': # type: ignore
+        from .activity import Activity
+        return Activity(
+            type=ActivityTypes.event,
+            name=ActivityEventNames.continue_conversation,
+            id=str(uuid()),
+            channel_id=self.channel_id,
+            service_url=self.service_url,
+            conversation=self.conversation,
+            recipient=self.bot,
+            from_property=self.user,
+            relates_to=self,
+        )

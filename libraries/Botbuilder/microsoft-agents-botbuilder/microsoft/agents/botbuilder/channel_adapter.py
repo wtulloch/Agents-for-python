@@ -1,18 +1,16 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from abc import ABC, abstractmethod
-from typing import List, Callable, Awaitable, Protocol
+from abc import abstractmethod
+from collections.abc import Callable
+from typing import List, Awaitable, Protocol
 from microsoft.agents.core.models import (
     Activity,
     ConversationReference,
     ConversationParameters,
     ResourceResponse,
 )
-from botframework.connector.auth import AppCredentials, ClaimsIdentity
 
-from . import conversation_reference_extension
-from .bot_assert import BotAssert
 from .turn_context import TurnContext
 from .middleware_set import MiddlewareSet
 
@@ -85,7 +83,7 @@ class ChannelAdapter(Protocol):
         self,
         bot_id: str,  # pylint: disable=unused-argument
         reference: ConversationReference,
-        callback: Callable,
+        callback: Callable[[TurnContext], Awaitable],
     ):
         """
         Sends a proactive message to a conversation. Call this method to proactively send a message to a conversation.
@@ -105,18 +103,18 @@ class ChannelAdapter(Protocol):
         :type audience: str
         """
         context = TurnContext(
-            self, conversation_reference_extension.get_continuation_activity(reference)
+            self, reference.get_continuation_activity()
         )
         return await self.run_pipeline(context, callback)
 
     async def create_conversation(
         self,
-        reference: ConversationReference,
-        logic: Callable[[TurnContext], Awaitable] = None,
-        conversation_parameters: ConversationParameters = None,
-        channel_id: str = None,
-        service_url: str = None,
-        credentials: AppCredentials = None,
+        bot_app_id: str,
+        channel_id: str,
+        service_url: str,
+        audience: str,
+        conversation_parameters: ConversationParameters,
+        callback: Callable[[TurnContext], Awaitable],
     ):
         """
         Starts a new conversation with a user. Used to direct message to a member of a group.
@@ -163,7 +161,8 @@ class ChannelAdapter(Protocol):
         :type callback: :class:`typing.Callable[[TurnContext], Awaitable]`
         :return:
         """
-        BotAssert.context_not_none(context)
+        if context is None:
+            raise TypeError(context.__class__.__name__)
 
         if context.activity is not None:
             try:

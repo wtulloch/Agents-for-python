@@ -23,6 +23,7 @@ from microsoft.agents.core.models import (
     InvokeResponse,
     ResourceResponse,
 )
+from microsoft.agents.connector import ConnectorClientBase
 from botframework.connector import Channels, ConnectorClient
 from botframework.connector.auth import (
     AuthenticationConstants,
@@ -35,13 +36,13 @@ from botframework.connector.auth.authenticate_request_result import (
 from botframework.connector.auth.connector_factory import ConnectorFactory
 from botframework.connector.auth.user_token_client import UserTokenClient
 from .channel_adapter import ChannelAdapter
-from .conversation_reference_extension import get_continuation_activity
 from .turn_context import TurnContext
 
 
 class ChannelServiceAdapter(ChannelAdapter, ABC):
     CONNECTOR_FACTORY_KEY = "ConnectorFactory"
     USER_TOKEN_CLIENT_KEY = "UserTokenClient"
+    _BOT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
 
     def __init__(
         self, bot_framework_authentication: BotFrameworkAuthentication
@@ -76,7 +77,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                 delay_time = int((activity.value or 1000) / 1000)
                 await sleep(delay_time)
             elif activity.type == ActivityTypes.invoke_response:
-                context.turn_state[self._INVOKE_RESPONSE_KEY] = activity
+                context.turn_state[self.INVOKE_RESPONSE_KEY] = activity
             elif (
                 activity.type == ActivityTypes.trace
                 and activity.channel_id != Channels.emulator
@@ -85,7 +86,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                 pass
             else:
                 connector_client: ConnectorClient = context.turn_state.get(
-                    self.BOT_CONNECTOR_CLIENT_KEY
+                    self._BOT_CONNECTOR_CLIENT_KEY
                 )
                 if not connector_client:
                     raise Error("Unable to extract ConnectorClient from turn context.")
@@ -179,7 +180,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
 
         return await self.process_proactive(
             self.create_claims_identity(bot_app_id),
-            get_continuation_activity(reference),
+            reference.get_continuation_activity(),
             None,
             callback,
         )
@@ -192,7 +193,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         logic: Callable[[TurnContext], Awaitable],
     ):
         return await self.process_proactive(
-            claims_identity, get_continuation_activity(reference), audience, logic
+            claims_identity, reference.get_continuation_activity(), audience, logic
         )
 
     async def create_conversation(  # pylint: disable=arguments-differ

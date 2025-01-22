@@ -13,16 +13,19 @@ from azure.core.credentials import AzureKeyCredential
 from azure.core.pipeline import policies
 from azure.core.rest import AsyncHttpResponse, HttpRequest
 
-from .._serialization import Deserializer, Serializer
 from ._user_token_client_configuration import TokenConfiguration
 from .operations import (
     BotSignInOperations,
     TokenInternalsOperations,
     UserTokenOperations,
 )
+from .._serialization import Deserializer, Serializer
+from ..bot_sign_in_base import BotSignInBase
+from ..user_token_base import UserTokenBase
+from ..user_token_client_base import UserTokenClientBase
 
 
-class UserTokenClient:  # pylint: disable=client-accepts-api-version-keyword
+class UserTokenClient(UserTokenClientBase):  # pylint: disable=client-accepts-api-version-keyword
     """Token.
 
     :ivar bot_sign_in: BotSignInOperations operations
@@ -79,6 +82,14 @@ class UserTokenClient:  # pylint: disable=client-accepts-api-version-keyword
         self.token_internals = TokenInternalsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+    
+    @property
+    def bot_sign_in(self) -> BotSignInBase:
+        return self.bot_sign_in
+    
+    @property
+    def user_token(self) -> UserTokenBase:
+        return self.user_token
 
     def send_request(
         self, request: HttpRequest, *, stream: bool = False, **kwargs: Any

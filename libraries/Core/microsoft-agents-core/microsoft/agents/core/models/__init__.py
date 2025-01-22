@@ -13,6 +13,7 @@ from .audio_card import AudioCard
 from .basic_card import BasicCard
 from .card_action import CardAction
 from .card_image import CardImage
+from .channels import Channels
 from .channel_account import ChannelAccount
 from .conversation_account import ConversationAccount
 from .conversation_members import ConversationMembers
@@ -88,6 +89,7 @@ __all__ = [
     "BasicCard",
     "CardAction",
     "CardImage",
+    "Channels",
     "ChannelAccount",
     "ConversationAccount",
     "ConversationMembers",
