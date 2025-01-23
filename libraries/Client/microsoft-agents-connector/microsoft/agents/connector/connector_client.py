@@ -98,7 +98,7 @@ class ConnectorClient(ConnectorClientBase):  # pylint: disable=client-accepts-ap
     
     @property
     def base_uri(self) -> str:
-        return self._client.base_url
+        return self._client._base_url
 
     def send_request(
         self, request: HttpRequest, *, stream: bool = False, **kwargs: Any

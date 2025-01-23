@@ -35,6 +35,8 @@ from azure.core.rest import AsyncHttpResponse, HttpRequest
 from azure.core.tracing.decorator_async import distributed_trace_async
 from azure.core.utils import case_insensitive_dict
 
+from ..attachments_base import AttachmentsBase
+from ..conversations_base import ConversationsBase
 from ._internals import (
     build_attachments_get_attachment_info_request,
     build_attachments_get_attachment_request,
@@ -95,7 +97,7 @@ ClsType = Optional[
 ]
 
 
-class AttachmentsOperations:
+class AttachmentsOperations(AttachmentsBase):
     """
     .. warning::
         **DO NOT** instantiate this class directly.
@@ -252,7 +254,7 @@ class AttachmentsOperations:
         return deserialized  # type: ignore
 
 
-class ConversationsOperations:
+class ConversationsOperations(ConversationsBase):
     """
     .. warning::
         **DO NOT** instantiate this class directly.

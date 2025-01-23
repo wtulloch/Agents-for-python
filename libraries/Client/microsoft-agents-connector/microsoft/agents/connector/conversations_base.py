@@ -9,15 +9,8 @@ from microsoft.agents.core.models import (
     Transcript, ChannelAccount, PagedMembersResult, AttachmentData
 )
 
+
 class ConversationsBase(Protocol):
-    @abstractmethod
-    async def get_attachment_info(self, attachment_id: str) -> AttachmentInfo:
-        raise NotImplementedError()
-
-    @abstractmethod
-    async def get_attachment(self) -> bytes:
-        pass
-
     @abstractmethod
     async def get_conversations(self, continuation_token: Optional[str] = None) -> ConversationsResult:
         """

@@ -7,13 +7,14 @@ from abc import ABC
 from asyncio import sleep
 from copy import Error
 from http import HTTPStatus
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, cast
 from uuid import uuid4
 
 from microsoft.agents.core.models import (
     Activity,
     ActivityEventNames,
     ActivityTypes,
+    Channels,
     ConversationAccount,
     ConversationReference,
     ConversationResourceResponse,
@@ -23,18 +24,15 @@ from microsoft.agents.core.models import (
     InvokeResponse,
     ResourceResponse,
 )
-from microsoft.agents.connector import ConnectorClientBase
-from botframework.connector import Channels, ConnectorClient
+from microsoft.agents.connector import ConnectorClientBase, UserTokenClientBase
+from microsoft.agents.authentication import AuthenticationConstants, ClaimsIdentity
 from botframework.connector.auth import (
-    AuthenticationConstants,
     BotFrameworkAuthentication,
-    ClaimsIdentity,
 )
 from botframework.connector.auth.authenticate_request_result import (
     AuthenticateRequestResult,
 )
 from botframework.connector.auth.connector_factory import ConnectorFactory
-from botframework.connector.auth.user_token_client import UserTokenClient
 from .channel_adapter import ChannelAdapter
 from .turn_context import TurnContext
 
@@ -85,9 +83,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                 # no-op
                 pass
             else:
-                connector_client: ConnectorClient = context.turn_state.get(
+                connector_client = cast(ConnectorClientBase, context.turn_state.get(
                     self._BOT_CONNECTOR_CLIENT_KEY
-                )
+                ))
                 if not connector_client:
                     raise Error("Unable to extract ConnectorClient from turn context.")
 
@@ -115,9 +113,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         if activity is None:
             raise TypeError("Expected Activity but got None instead")
 
-        connector_client: ConnectorClient = context.turn_state.get(
-            self.BOT_CONNECTOR_CLIENT_KEY
-        )
+        connector_client = cast(ConnectorClientBase, context.turn_state.get(
+            self._BOT_CONNECTOR_CLIENT_KEY
+        ))
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
 
@@ -138,9 +136,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         if not reference:
             raise TypeError("Expected ConversationReference but got None instead")
 
-        connector_client: ConnectorClient = context.turn_state.get(
+        connector_client = cast(ConnectorClientBase, context.turn_state.get(
             self.BOT_CONNECTOR_CLIENT_KEY
-        )
+        ))
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
 
@@ -150,11 +148,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
 
     async def continue_conversation(  # pylint: disable=arguments-differ
         self,
-        reference: ConversationReference,
-        callback: Callable,
-        bot_app_id: str = None,  # pylint: disable=unused-argument
-        claims_identity: ClaimsIdentity = None,  # pylint: disable=unused-argument
-        audience: str = None,  # pylint: disable=unused-argument
+        bot_app_id: str,  # pylint: disable=unused-argument
+        continuation_activity: Activity,
+        callback: Callable[[TurnContext], Awaitable],
     ):
         """
         Sends a proactive message to a conversation.
@@ -170,40 +166,39 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         and is generally found in the `MicrosoftAppId` parameter in `config.py`.
         :type bot_app_id: :class:`typing.str`
         """
-        if claims_identity:
-            return await self.continue_conversation_with_claims(
-                claims_identity=claims_identity,
-                reference=reference,
-                audience=audience,
-                logic=callback,
-            )
+        if not callable:
+            raise TypeError("Expected Callback (Callable[[TurnContext], Awaitable]) but got None instead")
+        
+        self._validate_continuation_activity(continuation_activity)
+        
+        claims_identity = self.create_claims_identity(bot_app_id)
 
         return await self.process_proactive(
-            self.create_claims_identity(bot_app_id),
-            reference.get_continuation_activity(),
-            None,
+            claims_identity,
+            continuation_activity,
+            claims_identity.get_token_audience(),
             callback,
         )
-
+    
     async def continue_conversation_with_claims(
         self,
         claims_identity: ClaimsIdentity,
-        reference: ConversationReference,
-        audience: str,
+        continuation_activity: Activity,
         logic: Callable[[TurnContext], Awaitable],
+        audience: str = None,
     ):
         return await self.process_proactive(
-            claims_identity, reference.get_continuation_activity(), audience, logic
+            claims_identity, continuation_activity, audience, logic
         )
 
     async def create_conversation(  # pylint: disable=arguments-differ
         self,
         bot_app_id: str,
-        callback: Callable[[TurnContext], Awaitable] = None,
-        conversation_parameters: ConversationParameters = None,
-        channel_id: str = None,
-        service_url: str = None,
-        audience: str = None,
+        channel_id: str,
+        service_url: str,
+        audience: str,
+        conversation_parameters: ConversationParameters,
+        callback: Callable[[TurnContext], Awaitable],
     ):
         if not service_url:
             raise TypeError(
@@ -266,7 +261,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         claims_identity: ClaimsIdentity,
         continuation_activity: Activity,
         audience: str,
-        logic: Callable[[TurnContext], Awaitable],
+        callback: Callable[[TurnContext], Awaitable],
     ):
         # Create the connector factory and  the inbound request, extracting parameters and then create a
         # connector for outbound requests.
@@ -293,12 +288,12 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
             audience,
             connector_client,
             user_token_client,
-            logic,
+            callback,
             connector_factory,
         )
 
         # Run the pipeline
-        await self.run_pipeline(context, logic)
+        await self.run_pipeline(context, callback)
 
     async def process_activity(
         self,
@@ -385,8 +380,25 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                 AuthenticationConstants.AUDIENCE_CLAIM: bot_app_id,
                 AuthenticationConstants.APP_ID_CLAIM: bot_app_id,
             },
-            True,
+            False,
         )
+    
+    @staticmethod
+    def _validate_continuation_activity(continuation_activity: Activity):
+        if not continuation_activity:
+            raise TypeError(
+                "CloudAdapter: continuation_activity is required."
+            )
+        
+        if not continuation_activity.conversation:
+            raise TypeError(
+                "CloudAdapter: continuation_activity.conversation is required."
+            )
+
+        if not continuation_activity.service_url:
+            raise TypeError(
+                "CloudAdapter: continuation_activity.service_url is required."
+            )
 
     def _create_create_activity(
         self,

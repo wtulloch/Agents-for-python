@@ -6,6 +6,7 @@ from typing import AsyncIterator, Optional, Protocol
 
 from microsoft.agents.core.models import AttachmentInfo
 
+
 class AttachmentsBase(Protocol):
     @abstractmethod
     async def get_attachment_info(self, attachment_id: str) -> AttachmentInfo:
