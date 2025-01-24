@@ -4,9 +4,13 @@ from typing import Optional
 
 from .authentication_constants import AuthenticationConstants
 
+
 class ClaimsIdentity:
     def __init__(
-        self, claims: dict[str, str], is_authenticated: bool, authentication_type: str = None
+        self,
+        claims: dict[str, str],
+        is_authenticated: bool,
+        authentication_type: str = None,
     ):
         self.claims = claims
         self.is_authenticated = is_authenticated
@@ -14,7 +18,7 @@ class ClaimsIdentity:
 
     def get_claim_value(self, claim_type: str) -> Optional[str]:
         return self.claims.get(claim_type)
-    
+
     def get_app_id(self) -> Optional[str]:
         """
         Gets the AppId from the current ClaimsIdentity.
@@ -22,7 +26,9 @@ class ClaimsIdentity:
         :return: The AppId if found, otherwise None.
         """
 
-        return self.claims.get(AuthenticationConstants.AUDIENCE_CLAIM, None) or self.claims.get(AuthenticationConstants.APP_ID_CLAIM, None)
+        return self.claims.get(
+            AuthenticationConstants.AUDIENCE_CLAIM, None
+        ) or self.claims.get(AuthenticationConstants.APP_ID_CLAIM, None)
 
     def get_outgoing_app_id(self) -> Optional[str]:
         """
@@ -53,7 +59,11 @@ class ClaimsIdentity:
             return False
 
         audience = self.claims.get(AuthenticationConstants.AUDIENCE_CLAIM, None)
-        if not audience or audience.lower() == AuthenticationConstants.BOT_FRAMEWORK_TOKEN_ISSUER.lower():
+        if (
+            not audience
+            or audience.lower()
+            == AuthenticationConstants.BOT_FRAMEWORK_TOKEN_ISSUER.lower()
+        ):
             return False
 
         app_id = self.get_outgoing_app_id()

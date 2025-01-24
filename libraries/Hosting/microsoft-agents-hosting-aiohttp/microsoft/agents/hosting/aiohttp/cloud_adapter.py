@@ -53,9 +53,7 @@ class CloudAdapter(ChannelServiceAdapter, BotFrameworkHttpAdapterIntegrationBase
         self._CHANNEL_ID_HEADER_NAME = "channelid"
         super().__init__(bot_framework_authentication)
 
-    async def process(
-        self, request: Request, bot: Bot
-    ) -> Optional[Response]:
+    async def process(self, request: Request, bot: Bot) -> Optional[Response]:
         if not request:
             raise TypeError("request can't be None")
         if not bot:

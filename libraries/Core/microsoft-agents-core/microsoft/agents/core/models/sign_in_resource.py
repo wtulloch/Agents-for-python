@@ -4,6 +4,7 @@ from ._type_aliases import NonEmptyString
 from .token_exchange_resource import TokenExchangeResource
 from .token_post_resource import TokenPostResource
 
+
 class SignInResource(BaseModel):
     """
     A type containing information for single sign-on.

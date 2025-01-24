@@ -102,9 +102,7 @@ class ChannelAdapter(Protocol):
         :param audience:A value signifying the recipient of the proactive message.
         :type audience: str
         """
-        context = TurnContext(
-            self, reference.get_continuation_activity()
-        )
+        context = TurnContext(self, reference.get_continuation_activity())
         return await self.run_pipeline(context, callback)
 
     async def create_conversation(

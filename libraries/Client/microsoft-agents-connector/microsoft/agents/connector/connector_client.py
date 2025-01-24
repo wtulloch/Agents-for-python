@@ -24,7 +24,9 @@ from .operations import (
 )
 
 
-class ConnectorClient(ConnectorClientBase):  # pylint: disable=client-accepts-api-version-keyword
+class ConnectorClient(
+    ConnectorClientBase
+):  # pylint: disable=client-accepts-api-version-keyword
     """The Azure Bot Service Connector APIs allow bots to send and receive
     messages, button clicks, and other programmatic events when connecting with
     end users. This API also includes facilities to get conversation metadata
@@ -87,15 +89,15 @@ class ConnectorClient(ConnectorClientBase):  # pylint: disable=client-accepts-ap
         self.connector_internals = ConnectorInternalsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-    
+
     @property
     def attachments(self) -> AttachmentsBase:
         return self._attachments
-    
+
     @property
     def conversations(self) -> ConversationsBase:
         return self._conversations
-    
+
     @property
     def base_uri(self) -> str:
         return self._client._base_url

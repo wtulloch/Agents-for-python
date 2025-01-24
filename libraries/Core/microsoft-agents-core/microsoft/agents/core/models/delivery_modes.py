@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class DeliveryModes(str, Enum):
     normal = "normal"
     notification = "notification"

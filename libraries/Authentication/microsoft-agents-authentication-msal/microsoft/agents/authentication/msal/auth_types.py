@@ -1,5 +1,5 @@
-
 from enum import Enum
+
 
 class AuthTypes(str, Enum):
     certificate = "certificate"

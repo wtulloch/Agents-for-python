@@ -39,9 +39,10 @@ class ConversationReference(AgentsModel):
     channel_id: NonEmptyString
     locale: NonEmptyString = None
     service_url: NonEmptyString
-    
-    def get_continuation_activity(self) -> 'Activity': # type: ignore
+
+    def get_continuation_activity(self) -> "Activity":  # type: ignore
         from .activity import Activity
+
         return Activity(
             type=ActivityTypes.event,
             name=ActivityEventNames.continue_conversation,

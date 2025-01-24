@@ -1,5 +1,5 @@
-
 from enum import Enum
+
 
 class ActionTypes(str, Enum):
     open_url = "openUrl"

@@ -83,9 +83,10 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                 # no-op
                 pass
             else:
-                connector_client = cast(ConnectorClientBase, context.turn_state.get(
-                    self._BOT_CONNECTOR_CLIENT_KEY
-                ))
+                connector_client = cast(
+                    ConnectorClientBase,
+                    context.turn_state.get(self._BOT_CONNECTOR_CLIENT_KEY),
+                )
                 if not connector_client:
                     raise Error("Unable to extract ConnectorClient from turn context.")
 
@@ -113,9 +114,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         if activity is None:
             raise TypeError("Expected Activity but got None instead")
 
-        connector_client = cast(ConnectorClientBase, context.turn_state.get(
-            self._BOT_CONNECTOR_CLIENT_KEY
-        ))
+        connector_client = cast(
+            ConnectorClientBase, context.turn_state.get(self._BOT_CONNECTOR_CLIENT_KEY)
+        )
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
 
@@ -136,9 +137,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         if not reference:
             raise TypeError("Expected ConversationReference but got None instead")
 
-        connector_client = cast(ConnectorClientBase, context.turn_state.get(
-            self.BOT_CONNECTOR_CLIENT_KEY
-        ))
+        connector_client = cast(
+            ConnectorClientBase, context.turn_state.get(self.BOT_CONNECTOR_CLIENT_KEY)
+        )
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
 
@@ -167,10 +168,12 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         :type bot_app_id: :class:`typing.str`
         """
         if not callable:
-            raise TypeError("Expected Callback (Callable[[TurnContext], Awaitable]) but got None instead")
-        
+            raise TypeError(
+                "Expected Callback (Callable[[TurnContext], Awaitable]) but got None instead"
+            )
+
         self._validate_continuation_activity(continuation_activity)
-        
+
         claims_identity = self.create_claims_identity(bot_app_id)
 
         return await self.process_proactive(
@@ -179,7 +182,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
             claims_identity.get_token_audience(),
             callback,
         )
-    
+
     async def continue_conversation_with_claims(
         self,
         claims_identity: ClaimsIdentity,
@@ -297,10 +300,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
 
     async def process_activity(
         self,
-        auth_header_or_authenticate_request_result:
-            str |
-            AuthenticateRequestResult
-        ,
+        auth_header_or_authenticate_request_result: str | AuthenticateRequestResult,
         activity: Activity,
         logic: Callable[[TurnContext], Awaitable],
     ):
@@ -382,14 +382,12 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
             },
             False,
         )
-    
+
     @staticmethod
     def _validate_continuation_activity(continuation_activity: Activity):
         if not continuation_activity:
-            raise TypeError(
-                "CloudAdapter: continuation_activity is required."
-            )
-        
+            raise TypeError("CloudAdapter: continuation_activity is required.")
+
         if not continuation_activity.conversation:
             raise TypeError(
                 "CloudAdapter: continuation_activity.conversation is required."

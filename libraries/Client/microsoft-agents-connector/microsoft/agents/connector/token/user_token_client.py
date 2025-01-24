@@ -25,7 +25,9 @@ from ..user_token_base import UserTokenBase
 from ..user_token_client_base import UserTokenClientBase
 
 
-class UserTokenClient(UserTokenClientBase):  # pylint: disable=client-accepts-api-version-keyword
+class UserTokenClient(
+    UserTokenClientBase
+):  # pylint: disable=client-accepts-api-version-keyword
     """Token.
 
     :ivar bot_sign_in: BotSignInOperations operations
@@ -82,11 +84,11 @@ class UserTokenClient(UserTokenClientBase):  # pylint: disable=client-accepts-ap
         self.token_internals = TokenInternalsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-    
+
     @property
     def bot_sign_in(self) -> BotSignInBase:
         return self.bot_sign_in
-    
+
     @property
     def user_token(self) -> UserTokenBase:
         return self.user_token

@@ -1,6 +1,11 @@
 from typing import Optional
 from urllib.parse import urlparse, ParseResult as URI
-from msal import ConfidentialClientApplication, ManagedIdentityClient, UserAssignedManagedIdentity, SystemAssignedManagedIdentity
+from msal import (
+    ConfidentialClientApplication,
+    ManagedIdentityClient,
+    UserAssignedManagedIdentity,
+    SystemAssignedManagedIdentity,
+)
 from requests import Session
 from cryptography.x509 import load_pem_x509_certificate
 from cryptography.hazmat.backends import default_backend
@@ -11,6 +16,7 @@ from microsoft.agents.authentication import AccessTokenProviderBase
 from .auth_types import AuthTypes
 from .msal_auth_configuration import MsalAuthConfiguration
 
+
 class MsalAuth(AccessTokenProviderBase):
 
     _client_credential_cache = None
@@ -18,7 +24,9 @@ class MsalAuth(AccessTokenProviderBase):
     def __init__(self, msal_configuration: MsalAuthConfiguration):
         self._msal_configuration = msal_configuration
 
-    async def get_access_token(self, resource_url: str, scopes: list[str], force_refresh: bool = False) -> str:
+    async def get_access_token(
+        self, resource_url: str, scopes: list[str], force_refresh: bool = False
+    ) -> str:
         valid_uri, instance_uri = self._uri_validator(resource_url)
         if not valid_uri:
             raise ValueError("Invalid instance URL")
@@ -26,7 +34,9 @@ class MsalAuth(AccessTokenProviderBase):
         local_scopes = self._resolve_scopes_list(instance_uri, scopes)
         msal_auth_client = self._create_client_application()
 
-        auth_result_payload = msal_auth_client.acquire_token_for_client(scopes=local_scopes)
+        auth_result_payload = msal_auth_client.acquire_token_for_client(
+            scopes=local_scopes
+        )
 
         return auth_result_payload.msal_auth_result.access_token
 
@@ -35,20 +45,23 @@ class MsalAuth(AccessTokenProviderBase):
 
         if self._msal_configuration.AUTH_TYPE == AuthTypes.system_managed_identity:
             msal_auth_client = ManagedIdentityClient(
-                                UserAssignedManagedIdentity(client_id=self._msal_configuration.CLIENT_ID),
-                                http_client= Session(),
-                            )
+                UserAssignedManagedIdentity(
+                    client_id=self._msal_configuration.CLIENT_ID
+                ),
+                http_client=Session(),
+            )
 
         elif self._msal_configuration.AUTH_TYPE == AuthTypes.user_managed_identity:
             msal_auth_client = ManagedIdentityClient(
-                                SystemAssignedManagedIdentity(),
-                                http_client= Session(),
-                            )
+                SystemAssignedManagedIdentity(),
+                http_client=Session(),
+            )
         else:
-            authority = f"https://login.microsoftonline.com/{self._msal_configuration.TENANT_ID or "botframework.com"}"
-            
+            authority_path = self._msal_configuration.TENANT_ID or "botframework.com"
+            authority = f"https://login.microsoftonline.com/{authority_path}"
+
             if self._client_credential_cache:
-                pass 
+                pass
             elif self._msal_configuration.AUTH_TYPE == AuthTypes.client_secret:
                 self._client_credential_cache = self._msal_configuration.CLIENT_SECRET
             elif self._msal_configuration.AUTH_TYPE == AuthTypes.certificate:
@@ -59,13 +72,14 @@ class MsalAuth(AccessTokenProviderBase):
                     public_certificate = file.read()
 
                 # Create an X509 object and calculate the thumbprint
-                cert = load_pem_x509_certificate(data=bytes(
-                    public_certificate, 'UTF-8'), backend=default_backend())
-                thumbprint = (cert.fingerprint(hashes.SHA1()).hex())
-                
+                cert = load_pem_x509_certificate(
+                    data=bytes(public_certificate, "UTF-8"), backend=default_backend()
+                )
+                thumbprint = cert.fingerprint(hashes.SHA1()).hex()
+
                 self._client_credential_cache = {
                     "thumbprint": thumbprint,
-                    "private_key": private_key
+                    "private_key": private_key,
                 }
             else:
                 raise NotImplementedError("Authentication type not supported")
@@ -77,13 +91,13 @@ class MsalAuth(AccessTokenProviderBase):
             )
 
         return msal_auth_client
-    
+
     def _uri_validator(url_str: str) -> tuple[bool, Optional[URI]]:
-            try:
-                result = urlparse(url_str)
-                return all([result.scheme, result.netloc]), result
-            except AttributeError:
-                return False, None
+        try:
+            result = urlparse(url_str)
+            return all([result.scheme, result.netloc]), result
+        except AttributeError:
+            return False, None
 
     def _resolve_scopes_list(self, instance_url: URI, scopes=None) -> list[str]:
         if scopes:
@@ -93,6 +107,8 @@ class MsalAuth(AccessTokenProviderBase):
         for scope in self._msal_configuration.SCOPES:
             scope_placeholder = scope
             if "{instance}" in scope_placeholder.lower():
-                scope_placeholder = scope_placeholder.replace("{instance}", f"{instance_url.scheme}://{instance_url.hostname}")
+                scope_placeholder = scope_placeholder.replace(
+                    "{instance}", f"{instance_url.scheme}://{instance_url.hostname}"
+                )
             temp_list.append(scope_placeholder)
         return temp_list

@@ -1,13 +1,11 @@
 from typing import Protocol
 from abc import abstractmethod
 
+
 class AccessTokenProviderBase(Protocol):
     @abstractmethod
     async def get_access_token(
-        self,
-        resource_url: str,
-        scopes: list[str],
-        force_refresh: bool = False
+        self, resource_url: str, scopes: list[str], force_refresh: bool = False
     ) -> str:
         """
         Used by Agents SDK to acquire access tokens for connection to agent services or clients.

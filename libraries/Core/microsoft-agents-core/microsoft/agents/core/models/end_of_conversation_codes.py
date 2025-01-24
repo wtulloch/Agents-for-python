@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class EndOfConversationCodes(str, Enum):
     unknown = "unknown"
     completed_successfully = "completedSuccessfully"

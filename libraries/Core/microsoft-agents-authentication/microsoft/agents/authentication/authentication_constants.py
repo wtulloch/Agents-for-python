@@ -15,16 +15,22 @@ class AuthenticationConstants(ABC):
     BOT_FRAMEWORK_OAUTH_URL = "https://api.botframework.com"
 
     # Public Azure Bot Service OpenId Metadata URL.
-    PUBLIC_AZURE_BOT_SERVICE_OPENID_METADATA_URL = "https://login.botframework.com/v1/.well-known/openidconfiguration"
+    PUBLIC_AZURE_BOT_SERVICE_OPENID_METADATA_URL = (
+        "https://login.botframework.com/v1/.well-known/openidconfiguration"
+    )
 
     # Public OpenId Metadata URL.
-    PUBLIC_OPENID_METADATA_URL = "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
+    PUBLIC_OPENID_METADATA_URL = (
+        "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
+    )
 
     # Enterprise Channel OpenId Metadata URL format.
     ENTERPRISE_CHANNEL_OPENID_METADATA_URL_FORMAT = "https://{0}.enterprisechannel.botframework.com/v1/.well-known/openidconfiguration"
 
     # Gov Azure Bot Service OpenId Metadata URL.
-    GOV_AZURE_BOT_SERVICE_OPENID_METADATA_URL = "https://login.botframework.azure.us/v1/.well-known/openidconfiguration"
+    GOV_AZURE_BOT_SERVICE_OPENID_METADATA_URL = (
+        "https://login.botframework.azure.us/v1/.well-known/openidconfiguration"
+    )
 
     # Gov OpenId Metadata URL.
     GOV_OPENID_METADATA_URL = "https://login.microsoftonline.us/cab8a31a-1906-4287-a0d8-4eef66b95f6e/v2.0/.well-known/openid-configuration"
