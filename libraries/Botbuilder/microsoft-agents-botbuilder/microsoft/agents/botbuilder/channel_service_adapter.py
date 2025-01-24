@@ -14,6 +14,7 @@ from microsoft.agents.core.models import (
     Activity,
     ActivityEventNames,
     ActivityTypes,
+    CallerIdConstants,
     Channels,
     ConversationAccount,
     ConversationReference,
@@ -26,13 +27,7 @@ from microsoft.agents.core.models import (
 )
 from microsoft.agents.connector import ConnectorClientBase, UserTokenClientBase
 from microsoft.agents.authentication import AuthenticationConstants, ClaimsIdentity
-from botframework.connector.auth import (
-    BotFrameworkAuthentication,
-)
-from botframework.connector.auth.authenticate_request_result import (
-    AuthenticateRequestResult,
-)
-from botframework.connector.auth.connector_factory import ConnectorFactory
+from .channel_service_client_factory_base import ChannelServiceClientFactoryBase
 from .channel_adapter import ChannelAdapter
 from .turn_context import TurnContext
 
@@ -40,17 +35,12 @@ from .turn_context import TurnContext
 class ChannelServiceAdapter(ChannelAdapter, ABC):
     CONNECTOR_FACTORY_KEY = "ConnectorFactory"
     USER_TOKEN_CLIENT_KEY = "UserTokenClient"
+    BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler"
+    CHANNEL_SERVICE_FACTORY_KEY = "ChannelServiceClientFactory"
     _BOT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
-
-    def __init__(
-        self, bot_framework_authentication: BotFrameworkAuthentication
-    ) -> None:
-        super().__init__()
-
-        if not bot_framework_authentication:
-            raise TypeError("Expected BotFrameworkAuthentication but got None instead")
-
-        self.bot_framework_authentication = bot_framework_authentication
+    _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
+    
+    _channel_service_client_factory : ChannelServiceClientFactoryBase = None
 
     async def send_activities(
         self, context: TurnContext, activities: list[Activity]
@@ -120,13 +110,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
 
-        response = await connector_client.conversations.update_activity(
+        return await connector_client.conversations.update_activity(
             activity.conversation.id, activity.id, activity
         )
-
-        response_id = response.id if response and response.id else None
-
-        return ResourceResponse(id=response_id) if response_id else None
 
     async def delete_activity(
         self, context: TurnContext, reference: ConversationReference
@@ -138,7 +124,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
             raise TypeError("Expected ConversationReference but got None instead")
 
         connector_client = cast(
-            ConnectorClientBase, context.turn_state.get(self.BOT_CONNECTOR_CLIENT_KEY)
+            ConnectorClientBase, context.turn_state.get(self._BOT_CONNECTOR_CLIENT_KEY)
         )
         if not connector_client:
             raise Error("Unable to extract ConnectorClient from turn context.")
@@ -149,7 +135,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
 
     async def continue_conversation(  # pylint: disable=arguments-differ
         self,
-        bot_app_id: str,  # pylint: disable=unused-argument
+        bot_app_id: str,
         continuation_activity: Activity,
         callback: Callable[[TurnContext], Awaitable],
     ):
@@ -218,13 +204,8 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         claims_identity = self.create_claims_identity(bot_app_id)
         claims_identity.claims[AuthenticationConstants.SERVICE_URL_CLAIM] = service_url
 
-        # create the connectror factory
-        connector_factory = self.bot_framework_authentication.create_connector_factory(
-            claims_identity
-        )
-
         # Create the connector client to use for outbound requests.
-        connector_client = await connector_factory.create(service_url, audience)
+        connector_client = await self._channel_service_client_factory.create_connector_client(claims_identity, service_url, audience)
 
         # Make the actual create conversation call using the connector.
         create_conversation_result = (
@@ -240,7 +221,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
 
         # Create a UserTokenClient instance for the application to use. (For example, in the OAuthPrompt.)
         user_token_client = (
-            await self.bot_framework_authentication.create_user_token_client(
+            await self._channel_service_client_factory.create_user_token_client(
                 claims_identity
             )
         )
@@ -253,7 +234,6 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
             connector_client,
             user_token_client,
             callback,
-            connector_factory,
         )
 
         # Run the pipeline
@@ -266,20 +246,14 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         audience: str,
         callback: Callable[[TurnContext], Awaitable],
     ):
-        # Create the connector factory and  the inbound request, extracting parameters and then create a
-        # connector for outbound requests.
-        connector_factory = self.bot_framework_authentication.create_connector_factory(
-            claims_identity
-        )
-
         # Create the connector client to use for outbound requests.
-        connector_client = await connector_factory.create(
-            continuation_activity.service_url, audience
+        connector_client = await self._channel_service_client_factory.create_connector_client(
+            claims_identity, continuation_activity.service_url, audience
         )
 
         # Create a UserTokenClient instance for the application to use. (For example, in the OAuthPrompt.)
         user_token_client = (
-            await self.bot_framework_authentication.create_user_token_client(
+            await self._channel_service_client_factory.create_user_token_client(
                 claims_identity
             )
         )
@@ -292,7 +266,6 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
             connector_client,
             user_token_client,
             callback,
-            connector_factory,
         )
 
         # Run the pipeline
@@ -300,9 +273,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
 
     async def process_activity(
         self,
-        auth_header_or_authenticate_request_result: str | AuthenticateRequestResult,
+        claims_identity: ClaimsIdentity,
         activity: Activity,
-        logic: Callable[[TurnContext], Awaitable],
+        callback: Callable[[TurnContext], Awaitable],
     ):
         """
         Creates a turn context and runs the middleware pipeline for an incoming activity.
@@ -324,53 +297,37 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
             If the task completes successfully, then an :class:`InvokeResponse` is returned;
             otherwise. `null` is returned.
         """
-        # Authenticate the inbound request, extracting parameters and create a ConnectorFactory for creating a
-        # Connector for outbound requests.
-        authenticate_request_result = (
-            await self.bot_framework_authentication.authenticate_request(
-                activity, auth_header_or_authenticate_request_result
-            )
-            if isinstance(auth_header_or_authenticate_request_result, str)
-            else auth_header_or_authenticate_request_result
-        )
+        scopes: list[str] = None
+        outgoing_audience: str = None
 
-        # Set the caller_id on the activity
-        activity.caller_id = authenticate_request_result.caller_id
-
+        if claims_identity.is_bot_claim():
+            outgoing_audience = claims_identity.get_token_audience()
+            scopes = [f"{claims_identity.get_outgoing_app_id()}/.default"]
+            activity.caller_id = f"{CallerIdConstants.bot_to_bot_prefix}{claims_identity.get_outgoing_app_id()}"
+        else:
+            outgoing_audience = AuthenticationConstants.BOT_FRAMEWORK_SCOPE
+        
+        use_anonymous_auth_callback = False
+        if not claims_identity.is_authenticated and activity.channel_id == Channels.emulator:
+            use_anonymous_auth_callback = True
+        
         # Create the connector client to use for outbound requests.
-        connector_client = (
-            await authenticate_request_result.connector_factory.create(
-                activity.service_url, authenticate_request_result.audience
-            )
-            if authenticate_request_result.connector_factory
-            else None
+        connector_client = await self._channel_service_client_factory.create_connector_client(
+            claims_identity, activity.service_url, outgoing_audience, scopes, use_anonymous_auth_callback
         )
-
-        if not connector_client:
-            raise Error("Unable to extract ConnectorClient from turn context.")
-
-        # Create a UserTokenClient instance for the application to use.
-        # (For example, it would be used in a sign-in prompt.)
-        user_token_client = (
-            await self.bot_framework_authentication.create_user_token_client(
-                authenticate_request_result.claims_identity
-            )
+        
+        # Create a UserTokenClient instance for the OAuth flow.
+        user_token_client = await self._channel_service_client_factory.create_user_token_client(
+            claims_identity, use_anonymous_auth_callback
         )
-
+        
         # Create a turn context and run the pipeline.
         context = self._create_turn_context(
-            activity,
-            authenticate_request_result.claims_identity,
-            authenticate_request_result.audience,
-            connector_client,
-            user_token_client,
-            logic,
-            authenticate_request_result.connector_factory,
+            activity, claims_identity, outgoing_audience, connector_client, user_token_client, callback
         )
-
-        # Run the pipeline
-        await self.run_pipeline(context, logic)
-
+        
+        await self.run_pipeline(context, callback)
+        
         # If there are any results they will have been left on the TurnContext.
         return self._process_turn_results(context)
 
@@ -425,20 +382,17 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         activity: Activity,
         claims_identity: ClaimsIdentity,
         oauth_scope: str,
-        connector_client: ConnectorClient,
-        user_token_client: UserTokenClient,
+        connector_client: ConnectorClientBase,
+        user_token_client: UserTokenClientBase,
         logic: Callable[[TurnContext], Awaitable],
-        connector_factory: ConnectorFactory,
     ) -> TurnContext:
         context = TurnContext(self, activity)
 
         context.turn_state[self.BOT_IDENTITY_KEY] = claims_identity
-        context.turn_state[self.BOT_CONNECTOR_CLIENT_KEY] = connector_client
+        context.turn_state[self._BOT_CONNECTOR_CLIENT_KEY] = connector_client
         context.turn_state[self.USER_TOKEN_CLIENT_KEY] = user_token_client
-
         context.turn_state[self.BOT_CALLBACK_HANDLER_KEY] = logic
-
-        context.turn_state[self.CONNECTOR_FACTORY_KEY] = connector_factory
+        context.turn_state[self.CHANNEL_SERVICE_FACTORY_KEY] = self._channel_service_client_factory
         context.turn_state[self.OAUTH_SCOPE_KEY] = oauth_scope
 
         return context
@@ -451,7 +405,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                 status=HTTPStatus.OK,
                 body=ExpectedReplies(
                     activities=context.buffered_reply_activities
-                ).serialize(),
+                ).model_dump(mode="json", by_alias=True, exclude_unset=True),
             )
 
         # Handle Invoke scenarios where the bot will return a specific body and return code.
