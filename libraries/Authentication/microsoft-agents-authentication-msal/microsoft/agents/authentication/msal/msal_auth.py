@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional
 from urllib.parse import urlparse, ParseResult as URI
 from msal import (
@@ -34,13 +36,20 @@ class MsalAuth(AccessTokenProviderBase):
         local_scopes = self._resolve_scopes_list(instance_uri, scopes)
         msal_auth_client = self._create_client_application()
 
-        auth_result_payload = msal_auth_client.acquire_token_for_client(
-            scopes=local_scopes
-        )
+        if isinstance(msal_auth_client, ManagedIdentityClient):
+            auth_result_payload = msal_auth_client.acquire_token_for_client(
+                resource=resource_url
+            )
+        elif isinstance(msal_auth_client, ConfidentialClientApplication):
+            auth_result_payload = msal_auth_client.acquire_token_for_client(
+                scopes=local_scopes
+            )
 
-        return auth_result_payload.msal_auth_result.access_token
+        return auth_result_payload["access_token"]
 
-    def _create_client_application(self):
+    def _create_client_application(
+        self,
+    ) -> ManagedIdentityClient | ConfidentialClientApplication:
         msal_auth_client = None
 
         if self._msal_configuration.AUTH_TYPE == AuthTypes.system_managed_identity:
