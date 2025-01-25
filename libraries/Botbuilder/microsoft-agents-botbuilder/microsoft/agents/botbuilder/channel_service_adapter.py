@@ -3,11 +3,10 @@
 
 from __future__ import annotations
 
-from abc import ABC
 from asyncio import sleep
 from copy import Error
 from http import HTTPStatus
-from typing import Awaitable, Callable, cast
+from typing import Awaitable, Callable, Protocol, cast
 from uuid import uuid4
 
 from microsoft.agents.core.models import (
@@ -32,7 +31,7 @@ from .channel_adapter import ChannelAdapter
 from .turn_context import TurnContext
 
 
-class ChannelServiceAdapter(ChannelAdapter, ABC):
+class ChannelServiceAdapter(ChannelAdapter, Protocol):
     CONNECTOR_FACTORY_KEY = "ConnectorFactory"
     USER_TOKEN_CLIENT_KEY = "UserTokenClient"
     BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler"
@@ -41,6 +40,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
 
     _channel_service_client_factory: ChannelServiceClientFactoryBase = None
+    
+    def __init__(self, channel_service_client_factory: ChannelServiceClientFactoryBase):
+        self._channel_service_client_factory = channel_service_client_factory
 
     async def send_activities(
         self, context: TurnContext, activities: list[Activity]
