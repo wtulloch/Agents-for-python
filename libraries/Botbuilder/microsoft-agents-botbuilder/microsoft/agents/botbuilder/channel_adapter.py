@@ -24,7 +24,9 @@ class ChannelAdapter(Protocol):
         self, on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None
     ):
         self.middleware_set = MiddlewareSet()
-        self.on_turn_error: Callable[[TurnContext, Exception], Awaitable] = on_turn_error
+        self.on_turn_error: Callable[[TurnContext, Exception], Awaitable] = (
+            on_turn_error
+        )
 
     @abstractmethod
     async def send_activities(

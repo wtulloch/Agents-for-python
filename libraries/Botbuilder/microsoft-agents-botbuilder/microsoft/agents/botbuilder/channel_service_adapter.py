@@ -40,7 +40,7 @@ class ChannelServiceAdapter(ChannelAdapter, Protocol):
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
 
     _channel_service_client_factory: ChannelServiceClientFactoryBase = None
-    
+
     def __init__(self, channel_service_client_factory: ChannelServiceClientFactoryBase):
         self._channel_service_client_factory = channel_service_client_factory
 
