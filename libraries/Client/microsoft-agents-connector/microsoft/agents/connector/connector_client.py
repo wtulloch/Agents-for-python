@@ -52,9 +52,9 @@ class ConnectorClient(
     """
 
     def __init__(  # pylint: disable=missing-client-constructor-parameter-credential
-        self,  credential: AsyncTokenCredential, *, endpoint: str = "", **kwargs: Any
+        self, credential: AsyncTokenCredential, *, endpoint: str = "", **kwargs: Any
     ) -> None:
-        self._config = ConnectorConfiguration(credential=credential,**kwargs)
+        self._config = ConnectorConfiguration(credential=credential, **kwargs)
         _policies = kwargs.pop("policies", None)
         if _policies is None:
             _policies = [
