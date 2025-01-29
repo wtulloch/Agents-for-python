@@ -6,7 +6,7 @@
 
 from typing import Any
 
-from azure.core.credentials import AzureKeyCredential
+from azure.core.credentials_async import AsyncTokenCredential
 from azure.core.pipeline import policies
 
 VERSION = "unknown"
@@ -19,14 +19,16 @@ class TokenConfiguration:  # pylint: disable=too-many-instance-attributes
     attributes.
 
     :param credential: Credential needed for the client to connect to Azure. Required.
-    :type credential: ~azure.core.credentials.AzureKeyCredential
+    :type credential: ~azure.core.credentials_async import AsyncTokenCredential
+
     """
 
-    def __init__(self, credential: AzureKeyCredential, **kwargs: Any) -> None:
+    def __init__(self, credential: AsyncTokenCredential, **kwargs: Any) -> None:
         if credential is None:
             raise ValueError("Parameter 'credential' must not be None.")
 
         self.credential = credential
+        self.credential_scopes = kwargs.pop("credential_scopes", [])
         kwargs.setdefault("sdk_moniker", "token/{}".format(VERSION))
         self.polling_interval = kwargs.get("polling_interval", 30)
         self._configure(**kwargs)
@@ -54,8 +56,11 @@ class TokenConfiguration:  # pylint: disable=too-many-instance-attributes
         self.retry_policy = kwargs.get("retry_policy") or policies.AsyncRetryPolicy(
             **kwargs
         )
-        self.authentication_policy = kwargs.get("authentication_policy")
+        if not self.credential_scopes and not self.authentication_policy:
+            raise ValueError(
+                "You must provide either credential_scopes or authentication_policy as kwargs"
+            )
         if self.credential and not self.authentication_policy:
-            self.authentication_policy = policies.AzureKeyCredentialPolicy(
-                self.credential, "Authorization", **kwargs
+            self.authentication_policy = policies.AsyncBearerTokenCredentialPolicy(
+                self.credential, *self.credential_scopes, **kwargs
             )

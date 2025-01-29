@@ -9,6 +9,7 @@ from typing import Any, Awaitable
 from typing_extensions import Self
 
 from azure.core import AsyncPipelineClient
+from azure.core.credentials_async import AsyncTokenCredential
 from azure.core.pipeline import policies
 from azure.core.rest import AsyncHttpResponse, HttpRequest
 
@@ -44,14 +45,16 @@ class ConnectorClient(
     :ivar connector_internals: ConnectorInternalsOperations operations
     :vartype connector_internals:
      microsoft.agents.connector.operations.ConnectorInternalsOperations
+    :param credential: Credential needed for the client to connect to Azure. Required.
+    :type credential: ~azure.core.credentials_async import AsyncTokenCredential
     :keyword endpoint: Service URL. Required. Default value is "".
     :paramtype endpoint: str
     """
 
     def __init__(  # pylint: disable=missing-client-constructor-parameter-credential
-        self, *, endpoint: str = "", **kwargs: Any
+        self,  credential: AsyncTokenCredential, *, endpoint: str = "", **kwargs: Any
     ) -> None:
-        self._config = ConnectorConfiguration(**kwargs)
+        self._config = ConnectorConfiguration(credential=credential,**kwargs)
         _policies = kwargs.pop("policies", None)
         if _policies is None:
             _policies = [

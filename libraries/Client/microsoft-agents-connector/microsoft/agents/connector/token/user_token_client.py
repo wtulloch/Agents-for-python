@@ -9,7 +9,7 @@ from typing import Any, Awaitable
 from typing_extensions import Self
 
 from azure.core import AsyncPipelineClient
-from azure.core.credentials import AzureKeyCredential
+from azure.core.credentials_async import AsyncTokenCredential
 from azure.core.pipeline import policies
 from azure.core.rest import AsyncHttpResponse, HttpRequest
 
@@ -38,13 +38,13 @@ class UserTokenClient(
     :vartype token_internals:
      microsoft.agents.connector.operations.TokenInternalsOperations
     :param credential: Credential needed for the client to connect to Azure. Required.
-    :type credential: ~azure.core.credentials.AzureKeyCredential
+    :type credential: ~azure.core.credentials_async import AsyncTokenCredential
     :keyword endpoint: Service URL. Required. Default value is "".
     :paramtype endpoint: str
     """
 
     def __init__(
-        self, credential: AzureKeyCredential, *, endpoint: str = "", **kwargs: Any
+        self, credential: AsyncTokenCredential, *, endpoint: str = "", **kwargs: Any
     ) -> None:
         self._config = TokenConfiguration(credential=credential, **kwargs)
         _policies = kwargs.pop("policies", None)
