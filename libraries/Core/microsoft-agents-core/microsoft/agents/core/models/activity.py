@@ -504,20 +504,21 @@ class Activity(AgentsModel):
 
         :returns: A conversation reference for the conversation that contains this activity.
         """
-        return ConversationReference(
-            activity_id=(
+        conversation_reference = {
+            "activityId": (
                 self.id
                 if self.type != ActivityTypes.conversation_update
                 or self.channel_id not in ["directline", "webchat"]
                 else None
             ),
-            user=copy(self.from_property),
-            bot=copy(self.recipient),
-            conversation=copy(self.conversation),
-            channel_id=self.channel_id,
-            locale=self.locale,
-            service_url=self.service_url,
-        )
+            "user": self.from_property.model_dump(by_alias=True, exclude_unset=True),
+            "bot": self.recipient.model_dump(by_alias=True, exclude_unset=True),
+            "conversation": self.conversation.model_dump(by_alias=True, exclude_unset=True),
+            "channelId": self.channel_id,
+            "locale": self.locale,
+            "serviceUrl": self.service_url,
+        }
+        return ConversationReference.model_validate(conversation_reference)
 
     def get_mentions(self) -> list[Mention]:
         """

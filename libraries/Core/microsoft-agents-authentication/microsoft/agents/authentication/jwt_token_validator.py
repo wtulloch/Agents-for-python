@@ -3,22 +3,23 @@ import jwt
 from jwt import PyJWKClient, PyJWK, decode, get_unverified_header
 
 from .bot_auth_configuration import BotAuthConfiguration
+from .claims_identity import ClaimsIdentity
 
 
 class JwtTokenValidator:
     def __init__(self, configuration: BotAuthConfiguration):
         self.configuration = configuration
 
-    def validate_token(self, token: str):
-        key = self._get_public_key_or_secret()
+    def validate_token(self, token: str) -> ClaimsIdentity:
+        key = self._get_public_key_or_secret(token)
         decoded_token = jwt.decode(
-            token, key=key, algorithms=["RS256"], options={"verify_audience": False}
+            token, key=key, algorithms=["RS256"], options={"verify_aud": False}
         )
         if decoded_token["aud"] != self.configuration.CLIENT_ID:
             raise ValueError("Invalid audience.")
 
         # This probably should return a ClaimsIdentity
-        return decoded_token
+        return ClaimsIdentity(decoded_token, True)
 
     def _get_public_key_or_secret(self, token: str) -> PyJWK:
         header = get_unverified_header(token)

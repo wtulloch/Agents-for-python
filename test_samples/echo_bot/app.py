@@ -46,6 +46,7 @@ async def messages(req: Request) -> Response:
 
 APP = web.Application(middlewares=[jwt_authorization_middleware])
 APP.router.add_post("/api/messages", messages)
+APP["bot_configuration"] = CONFIG
 
 if __name__ == "__main__":
     try:

@@ -53,6 +53,7 @@ class CloudAdapter(ChannelServiceAdapter, BotHttpAdapter):
             )
 
         self.on_turn_error = on_turn_error
+        self._channel_service_client_factory = channel_service_client_factory
 
         super().__init__(channel_service_client_factory)
 
@@ -69,7 +70,7 @@ class CloudAdapter(ChannelServiceAdapter, BotHttpAdapter):
             else:
                 raise HTTPUnsupportedMediaType()
 
-            activity: Activity = Activity.model_validate_json(body)
+            activity: Activity = Activity.model_validate(body)
             # TODO: Add the ability to pass in the ClaimsIdentity
             claims_identity: ClaimsIdentity = request.get("claims_identity")
 

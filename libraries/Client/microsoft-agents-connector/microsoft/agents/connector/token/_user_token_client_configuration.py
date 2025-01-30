@@ -56,11 +56,15 @@ class TokenConfiguration:  # pylint: disable=too-many-instance-attributes
         self.retry_policy = kwargs.get("retry_policy") or policies.AsyncRetryPolicy(
             **kwargs
         )
+        self.authentication_policy = kwargs.get("authentication_policy")
+        """
         if not self.credential_scopes and not self.authentication_policy:
             raise ValueError(
                 "You must provide either credential_scopes or authentication_policy as kwargs"
             )
+        """
         if self.credential and not self.authentication_policy:
+            scopes = self.credential_scopes or []
             self.authentication_policy = policies.AsyncBearerTokenCredentialPolicy(
-                self.credential, *self.credential_scopes, **kwargs
+                self.credential, *scopes, **kwargs
             )

@@ -75,10 +75,10 @@ class UserTokenClient(
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
-        self.bot_sign_in = BotSignInOperations(
+        self._bot_sign_in = BotSignInOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.user_token = UserTokenOperations(
+        self._user_token = UserTokenOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.token_internals = TokenInternalsOperations(
@@ -87,11 +87,11 @@ class UserTokenClient(
 
     @property
     def bot_sign_in(self) -> BotSignInBase:
-        return self.bot_sign_in
+        return self._bot_sign_in
 
     @property
     def user_token(self) -> UserTokenBase:
-        return self.user_token
+        return self._user_token
 
     def send_request(
         self, request: HttpRequest, *, stream: bool = False, **kwargs: Any

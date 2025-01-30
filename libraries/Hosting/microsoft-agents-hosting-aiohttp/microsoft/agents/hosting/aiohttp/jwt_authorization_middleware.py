@@ -12,13 +12,13 @@ async def jwt_authorization_middleware(request: Request, handler):
         # Extract the token from the Authorization header
         token = auth_header.split(" ")[1]
         try:
-            user = token_validator.validate_token(token)
-            request["user"] = user
+            claims = token_validator.validate_token(token)
+            request["claims_identity"] = claims
         except ValueError as e:
             return json_response({"error": str(e)}, status=401)
     else:
         if (not auth_config.CLIENT_ID) and (request.app["env"] == "DEV"):
-            # In development, if the client id is not set, we allow all requests
+            # TODO: Define anonymous strategy
             request["user"] = {"name": "anonymous"}
         else:
             return json_response(

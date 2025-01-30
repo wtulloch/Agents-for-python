@@ -20,8 +20,11 @@ class ChannelAdapter(Protocol):
     OAUTH_SCOPE_KEY = "Microsoft.Agents.BotBuilder.ChannelAdapter.OAuthScope"
     INVOKE_RESPONSE_KEY = "ChannelAdapter.InvokeResponse"
 
-    middleware_set: MiddlewareSet = None
     on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None
+    
+    def __init__(self):
+        super().__init__()
+        self.middleware_set = MiddlewareSet()
 
     @abstractmethod
     async def send_activities(
