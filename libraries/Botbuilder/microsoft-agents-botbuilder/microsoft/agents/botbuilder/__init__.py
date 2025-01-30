@@ -5,6 +5,7 @@ from .channel_service_adapter import ChannelServiceAdapter
 from .channel_service_client_factory_base import ChannelServiceClientFactoryBase
 from .message_factory import MessageFactory
 from .middleware_set import Middleware
+from .rest_channel_service_client_factory import RestChannelServiceClientFactory
 from .turn_context import TurnContext
 
 # Define the package's public interface
@@ -15,5 +16,6 @@ __all__ = [
     "ChannelServiceClientFactoryBase",
     "MessageFactory",
     "Middleware",
+    "RestChannelServiceClientFactory",
     "TurnContext",
 ]

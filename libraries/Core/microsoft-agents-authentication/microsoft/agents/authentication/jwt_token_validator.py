@@ -16,6 +16,8 @@ class JwtTokenValidator:
         )
         if decoded_token["aud"] != self.configuration.CLIENT_ID:
             raise ValueError("Invalid audience.")
+
+        # This probably should return a ClaimsIdentity
         return decoded_token
 
     def _get_public_key_or_secret(self, token: str) -> PyJWK:

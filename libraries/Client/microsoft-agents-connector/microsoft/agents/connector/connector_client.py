@@ -5,13 +5,14 @@
 # --------------------------------------------------------------------------
 
 from copy import deepcopy
-from typing import Any, Awaitable
+from typing import Any, Awaitable, Callable
 from typing_extensions import Self
 
 from azure.core import AsyncPipelineClient
 from azure.core.credentials_async import AsyncTokenCredential
 from azure.core.pipeline import policies
 from azure.core.rest import AsyncHttpResponse, HttpRequest
+from microsoft.agents.authentication import AccessTokenProviderBase
 
 from ._serialization import Deserializer, Serializer
 from ._connector_client_configuration import ConnectorConfiguration
@@ -23,6 +24,7 @@ from .operations import (
     ConnectorInternalsOperations,
     ConversationsOperations,
 )
+from ._agents_token_credential_adapter import AgentsTokenCredentialAdapter
 
 
 class ConnectorClient(
@@ -45,16 +47,29 @@ class ConnectorClient(
     :ivar connector_internals: ConnectorInternalsOperations operations
     :vartype connector_internals:
      microsoft.agents.connector.operations.ConnectorInternalsOperations
-    :param credential: Credential needed for the client to connect to Azure. Required.
-    :type credential: ~azure.core.credentials_async import AsyncTokenCredential
+    :param credential_token_provider: Token provider object that returns a valid access token.
+    :type credential_token_provider: from microsoft.agents.authentication import AccessTokenProviderBase
     :keyword endpoint: Service URL. Required. Default value is "".
     :paramtype endpoint: str
     """
 
     def __init__(  # pylint: disable=missing-client-constructor-parameter-credential
-        self, credential: AsyncTokenCredential, *, endpoint: str = "", **kwargs: Any
+        self,
+        endpoint: str,
+        credential_token_provider: AccessTokenProviderBase,
+        credential_resource_url: str,
+        credential_scopes: list[str] = None,
+        **kwargs: Any
     ) -> None:
-        self._config = ConnectorConfiguration(credential=credential, **kwargs)
+        agents_token_credential = AgentsTokenCredentialAdapter(
+            credential_token_provider, credential_resource_url
+        )
+        self._config = ConnectorConfiguration(
+            credential=agents_token_credential,
+            credential_scopes=credential_scopes,
+            **kwargs
+        )
+
         _policies = kwargs.pop("policies", None)
         if _policies is None:
             _policies = [

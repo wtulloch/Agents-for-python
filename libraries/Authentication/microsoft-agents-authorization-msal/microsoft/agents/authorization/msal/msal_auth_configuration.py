@@ -5,7 +5,7 @@ from microsoft.agents.authentication import BotAuthConfiguration
 from .auth_types import AuthTypes
 
 
-class MsalAuthConfiguration(Protocol, BotAuthConfiguration):
+class MsalAuthConfiguration(BotAuthConfiguration, Protocol):
     """
     Configuration for MSAL authentication.
     """

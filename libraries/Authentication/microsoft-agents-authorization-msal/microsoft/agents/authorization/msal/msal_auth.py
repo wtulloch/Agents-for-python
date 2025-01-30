@@ -101,6 +101,7 @@ class MsalAuth(AccessTokenProviderBase):
 
         return msal_auth_client
 
+    @staticmethod
     def _uri_validator(url_str: str) -> tuple[bool, Optional[URI]]:
         try:
             result = urlparse(url_str)

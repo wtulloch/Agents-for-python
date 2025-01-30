@@ -1,13 +1,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from typing import Awaitable, Callable, Optional
+from typing import Optional
 
 from aiohttp.web import (
     Request,
     Response,
     json_response,
-    WebSocketResponse,
     HTTPBadRequest,
     HTTPMethodNotAllowed,
     HTTPUnauthorized,
@@ -17,15 +16,12 @@ from microsoft.agents.authentication import ClaimsIdentity
 from microsoft.agents.core.models import (
     Activity,
     DeliveryModes,
-    InvokeResponse,
 )
-from microsoft.agents.connector import ConnectorClient
 from microsoft.agents.botbuilder import (
     Bot,
     ChannelServiceAdapter,
     ChannelServiceClientFactoryBase,
     MessageFactory,
-    Middleware,
     TurnContext,
 )
 
@@ -36,17 +32,12 @@ class CloudAdapter(ChannelServiceAdapter, BotHttpAdapter):
     def __init__(
         self,
         channel_service_client_factory: ChannelServiceClientFactoryBase,
-        *middlewares: Middleware,
     ):
         """
         Initializes a new instance of the CloudAdapter class.
 
         :param bot_framework_authentication: Optional BotFrameworkAuthentication instance
         """
-
-        if middlewares:
-            for middleware in middlewares:
-                self.use(middleware)
 
         async def on_turn_error(context: TurnContext, error: Exception):
             error_message = f"Exception caught : {error}"

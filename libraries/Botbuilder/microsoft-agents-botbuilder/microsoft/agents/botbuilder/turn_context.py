@@ -1,8 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import re
-from __future__ import annotations
+
 from copy import copy, deepcopy
 from collections.abc import Callable
 from datetime import datetime, timezone

@@ -44,7 +44,7 @@ class UserTokenClient(
     """
 
     def __init__(
-        self, credential: AsyncTokenCredential, *, endpoint: str = "", **kwargs: Any
+        self, credential: AsyncTokenCredential, endpoint: str = "", **kwargs: Any
     ) -> None:
         self._config = TokenConfiguration(credential=credential, **kwargs)
         _policies = kwargs.pop("policies", None)
