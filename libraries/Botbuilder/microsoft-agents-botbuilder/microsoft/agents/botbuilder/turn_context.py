@@ -168,8 +168,9 @@ class TurnContext:
             activity_or_text = Activity(
                 text=activity_or_text,
                 input_hint=input_hint or InputHints.accepting_input,
-                speak=speak,
             )
+            if speak:
+                activity_or_text.speak = speak
 
         result = await self.send_activities([activity_or_text])
         return result[0] if result else None

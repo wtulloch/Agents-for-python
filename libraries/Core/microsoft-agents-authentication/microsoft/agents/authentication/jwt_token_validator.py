@@ -13,7 +13,11 @@ class JwtTokenValidator:
     def validate_token(self, token: str) -> ClaimsIdentity:
         key = self._get_public_key_or_secret(token)
         decoded_token = jwt.decode(
-            token, key=key, algorithms=["RS256"], options={"verify_aud": False}
+            token,
+            key=key,
+            algorithms=["RS256"],
+            leeway=5.0,
+            options={"verify_aud": False},
         )
         if decoded_token["aud"] != self.configuration.CLIENT_ID:
             raise ValueError("Invalid audience.")

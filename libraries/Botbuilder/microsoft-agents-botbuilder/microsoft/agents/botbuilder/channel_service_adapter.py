@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from asyncio import sleep
+from abc import ABC
 from copy import Error
 from http import HTTPStatus
 from typing import Awaitable, Callable, Protocol, cast
@@ -31,7 +32,7 @@ from .channel_adapter import ChannelAdapter
 from .turn_context import TurnContext
 
 
-class ChannelServiceAdapter(ChannelAdapter, Protocol):
+class ChannelServiceAdapter(ChannelAdapter, ABC):
     CONNECTOR_FACTORY_KEY = "ConnectorFactory"
     USER_TOKEN_CLIENT_KEY = "UserTokenClient"
     BOT_CALLBACK_HANDLER_KEY = "BotCallbackHandler"
@@ -40,6 +41,7 @@ class ChannelServiceAdapter(ChannelAdapter, Protocol):
     _INVOKE_RESPONSE_KEY = "BotFrameworkAdapter.InvokeResponse"
 
     def __init__(self, channel_service_client_factory: ChannelServiceClientFactoryBase):
+        super().__init__()
         self._channel_service_client_factory = channel_service_client_factory
 
     async def send_activities(

@@ -38,6 +38,7 @@ class CloudAdapter(ChannelServiceAdapter, BotHttpAdapter):
 
         :param bot_framework_authentication: Optional BotFrameworkAuthentication instance
         """
+        super().__init__(channel_service_client_factory)
 
         async def on_turn_error(context: TurnContext, error: Exception):
             error_message = f"Exception caught : {error}"
@@ -54,8 +55,6 @@ class CloudAdapter(ChannelServiceAdapter, BotHttpAdapter):
 
         self.on_turn_error = on_turn_error
         self._channel_service_client_factory = channel_service_client_factory
-
-        super().__init__(channel_service_client_factory)
 
     async def process(self, request: Request, bot: Bot) -> Optional[Response]:
         if not request:

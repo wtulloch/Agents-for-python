@@ -1,5 +1,6 @@
 from copy import copy
 from datetime import datetime, timezone
+from typing import Optional
 from pydantic import Field
 from .activity_types import ActivityTypes
 from .channel_account import ChannelAccount
@@ -118,7 +119,8 @@ class Activity(AgentsModel):
     :type caller_id: str
     """
 
-    type: NonEmptyString
+    # TODO: Changed because of emulator
+    type: NonEmptyString = None
     id: NonEmptyString = None
     timestamp: datetime = None
     local_timestamp: datetime = None

@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import List, Awaitable, Protocol
 from microsoft.agents.core.models import (
@@ -15,7 +15,7 @@ from .turn_context import TurnContext
 from .middleware_set import MiddlewareSet
 
 
-class ChannelAdapter(Protocol):
+class ChannelAdapter(ABC):
     BOT_IDENTITY_KEY = "BotIdentity"
     OAUTH_SCOPE_KEY = "Microsoft.Agents.BotBuilder.ChannelAdapter.OAuthScope"
     INVOKE_RESPONSE_KEY = "ChannelAdapter.InvokeResponse"
@@ -23,7 +23,6 @@ class ChannelAdapter(Protocol):
     on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None
 
     def __init__(self):
-        super().__init__()
         self.middleware_set = MiddlewareSet()
 
     @abstractmethod
