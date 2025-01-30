@@ -82,7 +82,9 @@ class ChannelServiceAdapter(ChannelAdapter, Protocol):
 
                 if activity.reply_to_id:
                     response = await connector_client.conversations.reply_to_activity(
-                        activity.conversation.id, activity.reply_to_id, activity
+                        activity.conversation.id,
+                        activity.reply_to_id,
+                        activity.model_dump_json(by_alias=True, exclude_unset=True),
                     )
                 else:
                     response = (
@@ -312,6 +314,7 @@ class ChannelServiceAdapter(ChannelAdapter, Protocol):
             activity.caller_id = f"{CallerIdConstants.bot_to_bot_prefix}{claims_identity.get_outgoing_app_id()}"
         else:
             outgoing_audience = AuthenticationConstants.BOT_FRAMEWORK_SCOPE
+            scopes = [f"{AuthenticationConstants.BOT_FRAMEWORK_SCOPE}/.default"]
 
         use_anonymous_auth_callback = False
         if (

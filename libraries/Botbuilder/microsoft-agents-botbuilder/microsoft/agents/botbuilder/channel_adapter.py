@@ -21,7 +21,7 @@ class ChannelAdapter(Protocol):
     INVOKE_RESPONSE_KEY = "ChannelAdapter.InvokeResponse"
 
     on_turn_error: Callable[[TurnContext, Exception], Awaitable] = None
-    
+
     def __init__(self):
         super().__init__()
         self.middleware_set = MiddlewareSet()

@@ -504,6 +504,7 @@ class Activity(AgentsModel):
 
         :returns: A conversation reference for the conversation that contains this activity.
         """
+        # TODO: Fix serialization story
         conversation_reference = {
             "activityId": (
                 self.id
@@ -513,7 +514,9 @@ class Activity(AgentsModel):
             ),
             "user": self.from_property.model_dump(by_alias=True, exclude_unset=True),
             "bot": self.recipient.model_dump(by_alias=True, exclude_unset=True),
-            "conversation": self.conversation.model_dump(by_alias=True, exclude_unset=True),
+            "conversation": self.conversation.model_dump(
+                by_alias=True, exclude_unset=True
+            ),
             "channelId": self.channel_id,
             "locale": self.locale,
             "serviceUrl": self.service_url,

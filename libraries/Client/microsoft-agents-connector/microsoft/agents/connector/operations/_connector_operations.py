@@ -2899,9 +2899,11 @@ class ConversationsOperations(ConversationsBase):
         _request.url = self._client.format_url(_request.url)
 
         _stream = False
+
+        # TODO: Story for configuration of enforce_https
         pipeline_response: PipelineResponse = (
             await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
+                _request, stream=_stream, enforce_https=False, **kwargs
             )
         )
 

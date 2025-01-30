@@ -45,6 +45,7 @@ class MsalAuth(AccessTokenProviderBase):
                 scopes=local_scopes
             )
 
+        # TODO: Handling token error / acquisition failed
         return auth_result_payload["access_token"]
 
     def _create_client_application(
