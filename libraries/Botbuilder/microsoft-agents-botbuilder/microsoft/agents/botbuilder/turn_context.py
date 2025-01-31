@@ -166,6 +166,7 @@ class TurnContext:
         """
         if isinstance(activity_or_text, str):
             activity_or_text = Activity(
+                type=ActivityTypes.message,
                 text=activity_or_text,
                 input_hint=input_hint or InputHints.accepting_input,
             )

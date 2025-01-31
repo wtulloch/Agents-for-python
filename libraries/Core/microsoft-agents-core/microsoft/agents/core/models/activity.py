@@ -119,8 +119,7 @@ class Activity(AgentsModel):
     :type caller_id: str
     """
 
-    # TODO: Changed because of emulator
-    type: NonEmptyString = None
+    type: NonEmptyString
     id: NonEmptyString = None
     timestamp: datetime = None
     local_timestamp: datetime = None

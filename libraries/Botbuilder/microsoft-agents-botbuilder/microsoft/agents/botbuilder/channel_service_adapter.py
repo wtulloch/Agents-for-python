@@ -86,7 +86,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                     response = await connector_client.conversations.reply_to_activity(
                         activity.conversation.id,
                         activity.reply_to_id,
-                        activity.model_dump_json(by_alias=True, exclude_unset=True),
+                        activity.model_dump(by_alias=True, exclude_unset=True),
                     )
                 else:
                     response = (

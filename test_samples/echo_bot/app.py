@@ -1,10 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import traceback
-from datetime import datetime
-from http import HTTPStatus
-
 from aiohttp import web
 from aiohttp.web import Request, Response
 
@@ -16,13 +12,13 @@ from microsoft.agents.authorization.msal import MsalAuth
 from echo_bot import EchoBot
 from config import DefaultConfig
 
-PROVIDER = MsalAuth(DefaultConfig())
+AUTH_PROVIDER = MsalAuth(DefaultConfig())
 class DefaultConnection(Connections):
     def get_default_connection(self) -> AccessTokenProviderBase:
         pass
 
     def get_token_provider(self, claims_identity: ClaimsIdentity, service_url: str) -> AccessTokenProviderBase:
-        return PROVIDER
+        return AUTH_PROVIDER
 
     def get_connection(self, connection_name: str) -> AccessTokenProviderBase:
         pass
@@ -41,12 +37,14 @@ BOT = EchoBot()
 
 # Listen for incoming requests on /api/messages
 async def messages(req: Request) -> Response:
-    return await ADAPTER.process(req, BOT)
+    adapter: CloudAdapter = req.app["adapter"]
+    return await adapter.process(req, BOT)
 
 
 APP = web.Application(middlewares=[jwt_authorization_middleware])
 APP.router.add_post("/api/messages", messages)
 APP["bot_configuration"] = CONFIG
+APP["adapter"] = ADAPTER
 
 if __name__ == "__main__":
     try:
