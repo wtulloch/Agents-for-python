@@ -180,6 +180,7 @@ class TurnContext:
         self, activities: list[Activity]
     ) -> list[ResourceResponse]:
         sent_non_trace_activity = False
+        # TODO: Check activity serialization
         ref = self.activity.get_conversation_reference()
 
         def activity_validator(activity: Activity) -> Activity:

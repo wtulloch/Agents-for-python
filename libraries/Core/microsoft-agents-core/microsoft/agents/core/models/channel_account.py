@@ -19,7 +19,7 @@ class ChannelAccount(AgentsModel):
     """
 
     id: NonEmptyString
-    name: NonEmptyString = None
+    name: str = None
     aad_object_id: NonEmptyString = None
     role: NonEmptyString = None
     properties: object = None
