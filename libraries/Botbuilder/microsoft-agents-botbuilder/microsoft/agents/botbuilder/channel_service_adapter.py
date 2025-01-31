@@ -91,7 +91,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                 else:
                     response = (
                         await connector_client.conversations.send_to_conversation(
-                            activity.conversation.id, activity
+                            activity.conversation.id, activity.model_dump(by_alias=True, exclude_unset=True)
                         )
                     )
 

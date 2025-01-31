@@ -1,4 +1,5 @@
 from uuid import uuid4 as uuid
+from typing import Optional
 
 from .channel_account import ChannelAccount
 from .conversation_account import ConversationAccount
@@ -32,12 +33,13 @@ class ConversationReference(AgentsModel):
     :type service_url: str
     """
 
-    activity_id: NonEmptyString = None
+    # optionals here are due to webchat
+    activity_id: Optional[NonEmptyString] = None
     user: ChannelAccount = None
     bot: ChannelAccount
     conversation: ConversationAccount
     channel_id: NonEmptyString
-    locale: NonEmptyString = None
+    locale: Optional[NonEmptyString] = None
     service_url: NonEmptyString
 
     def get_continuation_activity(self) -> "Activity":  # type: ignore

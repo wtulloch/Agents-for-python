@@ -2906,6 +2906,7 @@ class ConversationsOperations(ConversationsBase):
                 _request, stream=_stream, enforce_https=False, **kwargs
             )
         )
+        await self._client._pipeline._transport.close() # pylint: disable=protected-access
 
         response = pipeline_response.http_response
 
