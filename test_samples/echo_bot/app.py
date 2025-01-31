@@ -1,8 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-from aiohttp import web
-from aiohttp.web import Request, Response
+from aiohttp.web import Application, Request, Response, run_app
 
 from microsoft.agents.botbuilder import RestChannelServiceClientFactory
 from microsoft.agents.hosting.aiohttp import CloudAdapter, jwt_authorization_middleware
@@ -41,13 +40,13 @@ async def messages(req: Request) -> Response:
     return await adapter.process(req, BOT)
 
 
-APP = web.Application(middlewares=[jwt_authorization_middleware])
+APP = Application(middlewares=[jwt_authorization_middleware])
 APP.router.add_post("/api/messages", messages)
 APP["bot_configuration"] = CONFIG
 APP["adapter"] = ADAPTER
 
 if __name__ == "__main__":
     try:
-        web.run_app(APP, host="localhost", port=CONFIG.PORT)
+        run_app(APP, host="localhost", port=CONFIG.PORT)
     except Exception as error:
         raise error

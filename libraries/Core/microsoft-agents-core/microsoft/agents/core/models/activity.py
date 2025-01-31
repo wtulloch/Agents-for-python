@@ -491,7 +491,7 @@ class Activity(AgentsModel):
         )
 
     @staticmethod
-    def create_typing_activity():
+    def create_typing_activity() -> "Activity":
         """
         Creates an instance of the :class:`Activity` class as a TypingActivity object.
 
@@ -499,30 +499,27 @@ class Activity(AgentsModel):
         """
         return Activity(type=ActivityTypes.typing)
 
-    def get_conversation_reference(self):
+    def get_conversation_reference(self) -> ConversationReference:
         """
         Creates a ConversationReference based on this activity.
 
         :returns: A conversation reference for the conversation that contains this activity.
         """
-        # TODO: Fix serialization story
-        conversation_reference = {
-            "activityId": (
+
+        return ConversationReference(
+            activity_id=(
                 self.id
                 if self.type != ActivityTypes.conversation_update
                 or self.channel_id not in ["directline", "webchat"]
                 else None
             ),
-            "user": self.from_property.model_dump(by_alias=True, exclude_unset=True),
-            "bot": self.recipient.model_dump(by_alias=True, exclude_unset=True),
-            "conversation": self.conversation.model_dump(
-                by_alias=True, exclude_unset=True
-            ),
-            "channelId": self.channel_id,
-            "locale": self.locale,
-            "serviceUrl": self.service_url,
-        }
-        return ConversationReference.model_validate(conversation_reference)
+            user=copy(self.from_property),
+            bot=copy(self.recipient),
+            conversation=copy(self.conversation),
+            channel_id=self.channel_id,
+            locale=self.locale,
+            service_url=self.service_url,
+        )
 
     def get_mentions(self) -> list[Mention]:
         """

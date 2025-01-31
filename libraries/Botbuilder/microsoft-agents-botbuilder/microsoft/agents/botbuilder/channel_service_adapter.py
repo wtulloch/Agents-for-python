@@ -7,7 +7,7 @@ from asyncio import sleep
 from abc import ABC
 from copy import Error
 from http import HTTPStatus
-from typing import Awaitable, Callable, Protocol, cast
+from typing import Awaitable, Callable, cast
 from uuid import uuid4
 
 from microsoft.agents.core.models import (
@@ -25,7 +25,12 @@ from microsoft.agents.core.models import (
     InvokeResponse,
     ResourceResponse,
 )
-from microsoft.agents.connector import ConnectorClientBase, UserTokenClientBase
+from microsoft.agents.connector import (
+    ConnectorClientBase,
+    UserTokenClientBase,
+    ConnectorClient,
+    UserTokenClient,
+)
 from microsoft.agents.authentication import AuthenticationConstants, ClaimsIdentity
 from .channel_service_client_factory_base import ChannelServiceClientFactoryBase
 from .channel_adapter import ChannelAdapter
@@ -91,7 +96,8 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                 else:
                     response = (
                         await connector_client.conversations.send_to_conversation(
-                            activity.conversation.id, activity
+                            activity.conversation.id,
+                            activity.model_dump(by_alias=True, exclude_unset=True),
                         )
                     )
 
@@ -326,7 +332,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
             use_anonymous_auth_callback = True
 
         # Create the connector client to use for outbound requests.
-        connector_client = (
+        connector_client: ConnectorClient = (
             await self._channel_service_client_factory.create_connector_client(
                 claims_identity,
                 activity.service_url,
@@ -337,7 +343,7 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         )
 
         # Create a UserTokenClient instance for the OAuth flow.
-        user_token_client = (
+        user_token_client: UserTokenClient = (
             await self._channel_service_client_factory.create_user_token_client(
                 claims_identity, use_anonymous_auth_callback
             )
@@ -354,6 +360,9 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         )
 
         await self.run_pipeline(context, callback)
+
+        await connector_client.close()
+        await user_token_client.close()
 
         # If there are any results they will have been left on the TurnContext.
         return self._process_turn_results(context)
