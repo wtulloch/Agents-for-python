@@ -70,7 +70,6 @@ class CloudAdapter(ChannelServiceAdapter, BotHttpAdapter):
                 raise HTTPUnsupportedMediaType()
 
             activity: Activity = Activity.model_validate(body)
-            # TODO: Add the ability to pass in the ClaimsIdentity
             claims_identity: ClaimsIdentity = request.get("claims_identity")
 
             # A POST request must contain an Activity
@@ -86,6 +85,7 @@ class CloudAdapter(ChannelServiceAdapter, BotHttpAdapter):
                 invoke_response = await self.process_activity(
                     claims_identity, activity, bot.on_turn
                 )
+
                 if (
                     activity.type == "invoke"
                     or activity.delivery_mode == DeliveryModes.expect_replies
