@@ -14,10 +14,11 @@ from .entity import Entity
 from .conversation_reference import ConversationReference
 from .text_highlight import TextHighlight
 from .semantic_action import SemanticAction
-from ._agents_model import AgentsModel
+from .agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
+# TODO: B2B Bot 2 is responding with None as id, had to mark it as optional (investigate)
 class Activity(AgentsModel):
     """An Activity is the basic communication type for the Bot Framework 3.0 protocol.
 
@@ -120,7 +121,7 @@ class Activity(AgentsModel):
     """
 
     type: NonEmptyString
-    id: NonEmptyString = None
+    id: Optional[NonEmptyString] = None
     timestamp: datetime = None
     local_timestamp: datetime = None
     local_timezone: NonEmptyString = None

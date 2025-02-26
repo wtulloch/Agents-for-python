@@ -3,7 +3,7 @@ from typing import Optional
 
 from .channel_account import ChannelAccount
 from .conversation_account import ConversationAccount
-from ._agents_model import AgentsModel
+from .agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 from .activity_types import ActivityTypes
 from .activity_event_names import ActivityEventNames
@@ -36,7 +36,7 @@ class ConversationReference(AgentsModel):
     # optionals here are due to webchat
     activity_id: Optional[NonEmptyString] = None
     user: ChannelAccount = None
-    bot: ChannelAccount
+    bot: ChannelAccount = None
     conversation: ConversationAccount
     channel_id: NonEmptyString
     locale: Optional[NonEmptyString] = None
