@@ -18,9 +18,9 @@ from .agents_model import AgentsModel
 from ._type_aliases import NonEmptyString
 
 
-# TODO: B2B Bot 2 is responding with None as id, had to mark it as optional (investigate)
+# TODO: A2A Agent 2 is responding with None as id, had to mark it as optional (investigate)
 class Activity(AgentsModel):
-    """An Activity is the basic communication type for the Bot Framework 3.0 protocol.
+    """An Activity is the basic communication type for the protocol.
 
     :param type: Contains the activity type. Possible values include:
         'message', 'contactRelationUpdate', 'conversationUpdate', 'typing',
@@ -72,7 +72,7 @@ class Activity(AgentsModel):
     :type text: str
     :param speak: The text to speak.
     :type speak: str
-    :param input_hint: Indicates whether your bot is accepting, expecting, or ignoring user input after the message is delivered to the client.
+    :param input_hint: Indicates whether your agent is accepting, expecting, or ignoring user input after the message is delivered to the client.
         Possible values include: 'acceptingInput', 'ignoringInput', 'expectingInput'
     :type input_hint: str or ~microsoft.agents.protocols.models.InputHints
     :param summary: The text to display if the channel cannot render cards.
@@ -115,8 +115,8 @@ class Activity(AgentsModel):
     :type text_highlights: list[~microsoft.agents.protocols.models.TextHighlight]
     :param semantic_action: An optional programmatic action accompanying this request
     :type semantic_action: ~microsoft.agents.protocols.models.SemanticAction
-    :param caller_id: A string containing an IRI identifying the caller of a bot. This field is not intended to be transmitted over the wire,
-        but is instead populated by bots and clients based on cryptographically verifiable data that asserts the identity of the callers (e.g. tokens).
+    :param caller_id: A string containing an IRI identifying the caller of an agent. This field is not intended to be transmitted over the wire,
+        but is instead populated by agents and clients based on cryptographically verifiable data that asserts the identity of the callers (e.g. tokens).
     :type caller_id: str
     """
 
@@ -170,8 +170,8 @@ class Activity(AgentsModel):
         Updates this activity with the delivery information from an existing ConversationReference.
 
         :param reference: The existing conversation reference.
-        :param is_incoming: Optional, True to treat the activity as an incoming activity, where the bot is the recipient; otherwise, False.
-            Default is False, and the activity will show the bot as the sender.
+        :param is_incoming: Optional, True to treat the activity as an incoming activity, where the agent is the recipient; otherwise, False.
+            Default is False, and the activity will show the agent as the sender.
 
         :returns: This activity, updated with the delivery information.
 
@@ -188,12 +188,12 @@ class Activity(AgentsModel):
 
         if is_incoming:
             self.from_property = reference.user
-            self.recipient = reference.bot
+            self.recipient = reference.agent
 
             if reference.activity_id is not None:
                 self.id = reference.activity_id
         else:
-            self.from_property = reference.bot
+            self.from_property = reference.agent
             self.recipient = reference.user
 
             if reference.activity_id is not None:
@@ -515,7 +515,7 @@ class Activity(AgentsModel):
                 else None
             ),
             user=copy(self.from_property),
-            bot=copy(self.recipient),
+            agent=copy(self.recipient),
             conversation=copy(self.conversation),
             channel_id=self.channel_id,
             locale=self.locale,

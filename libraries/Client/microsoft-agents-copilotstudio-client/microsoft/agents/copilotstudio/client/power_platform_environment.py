@@ -1,7 +1,7 @@
 from urllib.parse import urlparse, urlunparse
 from typing import Optional
 from .connection_settings import ConnectionSettings
-from .bot_type import BotType
+from .agent_type import AgentType
 from .power_platform_cloud import PowerPlatformCloud
 
 
@@ -17,7 +17,7 @@ class PowerPlatformEnvironment:
     def get_copilot_studio_connection_url(
         settings: ConnectionSettings,
         conversation_id: Optional[str] = None,
-        bot_type: BotType = BotType.PUBLISHED,
+        agent_type: AgentType = AgentType.PUBLISHED,
         cloud: PowerPlatformCloud = PowerPlatformCloud.PROD,
         cloud_base_address: Optional[str] = None,
     ) -> str:
@@ -27,8 +27,8 @@ class PowerPlatformEnvironment:
             )
         if not settings.environment_id:
             raise ValueError("EnvironmentId must be provided")
-        if not settings.bot_identifier:
-            raise ValueError("BotIdentifier must be provided")
+        if not settings.agent_identifier:
+            raise ValueError("AgentIdentifier must be provided")
         if settings.cloud and settings.cloud != PowerPlatformCloud.UNKNOWN:
             cloud = settings.cloud
         if cloud == PowerPlatformCloud.OTHER:
@@ -42,15 +42,15 @@ class PowerPlatformEnvironment:
                 raise ValueError(
                     "Either CustomPowerPlatformCloud or cloud_base_address must be provided when PowerPlatformCloud is Other"
                 )
-        if settings.copilot_bot_type:
-            bot_type = settings.copilot_bot_type
+        if settings.copilot_agent_type:
+            agent_type = settings.copilot_agent_type
 
         cloud_base_address = cloud_base_address or "api.unknown.powerplatform.com"
         host = PowerPlatformEnvironment.get_environment_endpoint(
             cloud, settings.environment_id, cloud_base_address
         )
         return PowerPlatformEnvironment.create_uri(
-            settings.bot_identifier, host, bot_type, conversation_id
+            settings.agent_identifier, host, agent_type, conversation_id
         )
 
     @staticmethod
@@ -87,15 +87,15 @@ class PowerPlatformEnvironment:
 
     @staticmethod
     def create_uri(
-        bot_identifier: str,
+        agent_identifier: str,
         host: str,
-        bot_type: BotType,
+        agent_type: AgentType,
         conversation_id: Optional[str],
     ) -> str:
-        bot_path_name = (
-            "dataverse-backed" if bot_type == BotType.PUBLISHED else "prebuilt"
+        agent_path_name = (
+            "dataverse-backed" if agent_type == AgentType.PUBLISHED else "prebuilt"
         )
-        path = f"/copilotstudio/{bot_path_name}/authenticated/bots/{bot_identifier}/conversations"
+        path = f"/copilotstudio/{agent_path_name}/authenticated/bots/{agent_identifier}/conversations"
         if conversation_id:
             path += f"/{conversation_id}"
         return urlunparse(
