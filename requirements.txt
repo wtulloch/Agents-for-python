@@ -14,5 +14,5 @@ openai
 openai-agents
 requests-oauthlib
 python-dotenv
-
+msal_extensions
 # Python version requirement: >=3.9
