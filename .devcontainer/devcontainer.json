@@ -1,6 +1,6 @@
 {
     "name": "Python Agent Development",
-    "hostRequirements": {{
+    "hostRequirements": {
         "cpus": 4
     },
     "build": {
@@ -27,6 +27,7 @@
                 "ms-toolsai.jupyter",
                 "ms-python.python",
                 "GitHub.copilot",
+                "ms-python.poetry"
             ]
         },
         "settings": {
@@ -35,14 +36,13 @@
             "python.linting.flake8Enabled": true,
             "python.formatting.provider": "black",
             "editor.formatOnSave": true,
-            "python.testing.pytestEnabled": true
+            "python.testing.pytestEnabled": true,
+            "python.poetry.path": "/usr/local/bin/poetry"
         }
     },
     "features": {
-        "azure-cli":"latest"
-    }
-   
- ,
+        "azure-cli": "latest"
+    },
     "forwardPorts": [],
-    "postCreateCommand": "git config --global --add safe.directory /workspaces/agent-python"
+    "postCreateCommand": "git config --global --add safe.directory /workspaces/copilot-studio-evaluation && poetry install"
 }

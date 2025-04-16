@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "agent-for-python"
+version = "0.0.1"
+description = "Microsoft Agents for Python"
+authors = ["Microsoft Corporation"]
+readme = "README.md"
+repository = "https://github.com/microsoft/agent-python"
+package-mode = false
+
+[tool.poetry.urls]
+"Homepage" = "https://github.com/microsoft/agent-python"
+"Bug Tracker" = "https://github.com/microsoft/agent-python/issues"
+
+[tool.poetry.dependencies]
+python = ">=3.9.2"
+pydantic = ">=2.10.4"
+requests = ">=2.32.3"
+cryptography = ">=44.0.0"
+aiohttp = ">=3.11.11"
+msal = ">=1.31.1"
+isodate = ">=0.6.1"
+azure-core = ">=1.30.0"
+python-dotenv = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.3.1"
+pytest-asyncio = ">=0.21.0"
+black = ">=23.3.0"
+isort = ">=5.12.0"
+mypy = ">=1.3.0"
+flake8 = ">=6.0.0"
+
+[tool.poetry.group.samples.dependencies]
+openai = "*"
+openai-agents = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
