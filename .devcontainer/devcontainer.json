@@ -44,5 +44,5 @@
         "azure-cli": "latest"
     },
     "forwardPorts": [],
-    "postCreateCommand": "git config --global --add safe.directory /workspaces/copilot-studio-evaluation && poetry install"
+    "postCreateCommand": "git config --global --add safe.directory /workspaces/agents-for-python && pip install -r requirements.txt"
 }
