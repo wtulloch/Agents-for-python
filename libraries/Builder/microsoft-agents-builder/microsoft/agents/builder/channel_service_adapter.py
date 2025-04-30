@@ -39,7 +39,6 @@ from .turn_context import TurnContext
 
 class ChannelServiceAdapter(ChannelAdapter, ABC):
     _AGENT_CONNECTOR_CLIENT_KEY = "ConnectorClient"
-    _INVOKE_RESPONSE_KEY = "ChannelServiceAdapter.InvokeResponse"
 
     def __init__(self, channel_service_client_factory: ChannelServiceClientFactoryBase):
         super().__init__()
@@ -87,18 +86,15 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
                     response = await connector_client.conversations.reply_to_activity(
                         activity.conversation.id,
                         activity.reply_to_id,
-                        activity.model_dump(by_alias=True, exclude_unset=True),
+                        activity,
                     )
                 else:
                     response = (
                         await connector_client.conversations.send_to_conversation(
                             activity.conversation.id,
-                            activity.model_dump(by_alias=True, exclude_unset=True),
+                            activity,
                         )
                     )
-            # TODO: The connector client is not casting the response but returning the JSON, need to fix it appropiatly
-            if not isinstance(response, ResourceResponse):
-                response = ResourceResponse.model_validate(response)
             response = response or ResourceResponse(id=activity.id or "")
 
             responses.append(response)
@@ -455,12 +451,12 @@ class ChannelServiceAdapter(ChannelAdapter, ABC):
         # Handle Invoke scenarios where the agent will return a specific body and return code.
         if context.activity.type == ActivityTypes.invoke:
             activity_invoke_response: Activity = context.turn_state.get(
-                self._INVOKE_RESPONSE_KEY
+                self.INVOKE_RESPONSE_KEY
             )
             if not activity_invoke_response:
                 return InvokeResponse(status=HTTPStatus.NOT_IMPLEMENTED)
 
-            return activity_invoke_response.value
+            return InvokeResponse.model_validate(activity_invoke_response.value)
 
         # No body to return
         return None
