@@ -8,6 +8,7 @@ from typing import Optional
 from aiohttp import ClientSession
 
 from microsoft.agents.connector import UserTokenClientBase
+from microsoft.agents.core.models import TokenResponse, TokenStatus, SignInResource
 from ..user_token_base import UserTokenBase
 from ..agent_sign_in_base import AgentSignInBase
 
@@ -60,7 +61,7 @@ class AgentSignIn(AgentSignInBase):
         code_challenge: Optional[str] = None,
         emulator_url: Optional[str] = None,
         final_redirect: Optional[str] = None,
-    ) -> dict:
+    ) -> SignInResource:
         """
         Get sign-in resource.
 
@@ -79,14 +80,14 @@ class AgentSignIn(AgentSignInBase):
             params["finalRedirect"] = final_redirect
 
         async with self.client.get(
-            "api/agentsignin/getSignInResource", params=params
+            "api/botsignin/getSignInResource", params=params
         ) as response:
             if response.status >= 400:
                 logger.error(f"Error getting sign-in resource: {response.status}")
                 response.raise_for_status()
 
             data = await response.json()
-            return data
+            return SignInResource.model_validate(data)
 
 
 class UserToken(UserTokenBase):
@@ -101,7 +102,7 @@ class UserToken(UserTokenBase):
         connection_name: str,
         channel_id: Optional[str] = None,
         code: Optional[str] = None,
-    ) -> dict:
+    ) -> TokenResponse:
         """
         Gets a token for a user and connection.
 
@@ -119,12 +120,14 @@ class UserToken(UserTokenBase):
             params["code"] = code
 
         async with self.client.get("api/usertoken/GetToken", params=params) as response:
-            if response.status >= 400 and response.status != 404:
+            if response.status == 404:
+                return TokenResponse(model_validate={})
+            if response.status >= 400:
                 logger.error(f"Error getting token: {response.status}")
                 response.raise_for_status()
 
             data = await response.json()
-            return data
+            return TokenResponse.model_validate(data)
 
     async def get_aad_tokens(
         self,
@@ -132,7 +135,7 @@ class UserToken(UserTokenBase):
         connection_name: str,
         channel_id: Optional[str] = None,
         body: Optional[dict] = None,
-    ) -> dict:
+    ) -> dict[str, TokenResponse]:
         """
         Gets Azure Active Directory tokens for a user and connection.
 
@@ -155,7 +158,7 @@ class UserToken(UserTokenBase):
                 response.raise_for_status()
 
             data = await response.json()
-            return data
+            return {k: TokenResponse.model_validate(v) for k, v in data.items()}
 
     async def sign_out(
         self,
@@ -189,7 +192,7 @@ class UserToken(UserTokenBase):
         user_id: str,
         channel_id: Optional[str] = None,
         include: Optional[str] = None,
-    ) -> list:
+    ) -> list[TokenStatus]:
         """
         Gets token status for the user.
 
@@ -213,7 +216,7 @@ class UserToken(UserTokenBase):
                 response.raise_for_status()
 
             data = await response.json()
-            return data
+            return [TokenStatus.model_validate(status) for status in data]
 
     async def exchange_token(
         self,
@@ -221,7 +224,7 @@ class UserToken(UserTokenBase):
         connection_name: str,
         channel_id: str,
         body: Optional[dict] = None,
-    ) -> dict:
+    ) -> TokenResponse:
         """
         Exchanges a token.
 
@@ -238,14 +241,14 @@ class UserToken(UserTokenBase):
         }
 
         async with self.client.post(
-            "api/usertoken/ExchangeToken", params=params, json=body
+            "api/usertoken/exchange", params=params, json=body
         ) as response:
             if response.status >= 400 and response.status != 404:
                 logger.error(f"Error exchanging token: {response.status}")
                 response.raise_for_status()
 
             data = await response.json()
-            return data
+            return TokenResponse.model_validate(data)
 
 
 class UserTokenClient(UserTokenClientBase):

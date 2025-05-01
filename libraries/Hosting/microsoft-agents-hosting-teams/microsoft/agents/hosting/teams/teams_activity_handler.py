@@ -545,7 +545,7 @@ class TeamsActivityHandler(ActivityHandler):
             elif event_type == "teamUnarchived":
                 return await self.on_teams_team_unarchived(turn_context)
 
-            return await super().on_conversation_update_activity(turn_context)
+        return await super().on_conversation_update_activity(turn_context)
 
     async def on_message_update_activity(self, turn_context: TurnContext):
         """
@@ -651,9 +651,7 @@ class TeamsActivityHandler(ActivityHandler):
             else:
                 # Try to get the full member details from Teams
                 try:
-                    teams_member = await TeamsInfo.get_member(
-                        turn_context.activity, member.id
-                    )
+                    teams_member = await TeamsInfo.get_member(turn_context, member.id)
                     teams_members_added.append(teams_member)
                 except Exception as err:
                     # Handle case where conversation is not found
